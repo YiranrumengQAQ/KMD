@@ -7,13 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- CSP 修复：允许 picsum 及其 CDN 子域名 -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         style-src 'unsafe-inline' https://fonts.googleapis.com;
         font-src https://fonts.gstatic.com;
-        img-src 'self' https://picsum.photos data:;
+        img-src 'self' https://picsum.photos https://*.picsum.photos data:;
         script-src 'unsafe-inline' 'unsafe-eval';
-        connect-src 'self' https://picsum.photos;
+        connect-src 'self' https://picsum.photos https://*.picsum.photos;
     " />
     <style>
         /* ===== 全部样式保持不变 ===== */
@@ -1269,7 +1270,7 @@
         /**
          * ============================================================
          *  愉悦分析 Pro · 完整模块 (ES6 IIFE)
-         *  修复图片加载：改用 seed 模式确保稳定
+         *  修复：CSP 放宽 + 下载改用 a 标签
          * ============================================================
          */
         (() => {
@@ -1468,14 +1469,13 @@
             let sessionHistory = [];
 
             // ============================================================
-            //  ★★★ 图片加载管理器 (使用 seed 模式确保稳定) ★★★
+            //  ★★★ 图片加载管理器 (使用 seed 模式 + 修复下载) ★★★
             // ============================================================
             const ImageLoadManager = {
                 maxRetries: 3,
                 retryDelay: 2000,
                 retryingImages: new Map(),
 
-                // 生成图片 URL：使用 seed 模式，保证每个 id 都有图片
                 buildImageUrl(id) {
                     return `https://picsum.photos/seed/${id}/400/300`;
                 },
@@ -1528,7 +1528,6 @@
                         loading.style.fontSize = '0.85rem';
                         loading.style.color = 'var(--danger)';
                         this.retryingImages.delete(originalId);
-                        // 最后尝试换一个 id
                         setTimeout(() => {
                             const newId = Math.floor(Math.random() * 10000);
                             this.retryWithNewId(img, loading, newId, downloadBtn);
@@ -1548,7 +1547,6 @@
                     retryInfo.textContent = `尝试加载 ${attemptNumber}/${this.maxRetries}`;
                     this.retryingImages.set(originalId, attemptNumber);
                     setTimeout(() => {
-                        // 重试时换一个随机 id，但保持 seed 模式
                         const newId = Math.floor(Math.random() * 10000);
                         img.src = this.buildImageUrl(newId) + '?t=' + Date.now();
                         img.onerror = () => this.handleImageError(img, loading, originalId, attemptNumber + 1,
@@ -1592,44 +1590,26 @@
                     img.onerror = () => this.handleImageError(img, loading, newId, 1, downloadBtn);
                 },
 
+                // 修复下载：使用 a 标签，避免跨域问题
                 downloadImage(img, imageId) {
                     const downloadBtn = img.parentElement.querySelector('.download-btn');
                     downloadBtn.classList.add('downloading');
+                    // 直接使用 img.src 创建下载链接
+                    const link = document.createElement('a');
+                    link.href = img.src;
+                    link.download = `风景-${imageId}-${Date.now()}.jpg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // 显示成功反馈
+                    downloadBtn.classList.remove('downloading');
                     downloadBtn.innerHTML =
-                        '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin-continuous 0.7s linear infinite;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 10"/></svg>';
-                    fetch(img.src)
-                        .then(response => {
-                            if (!response.ok) throw new Error('网络错误');
-                            return response.blob();
-                        })
-                        .then(blob => {
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `风景-${imageId}-${Date.now()}.jpg`;
-                            document.body.appendChild(a);
-                            a.click();
-                            setTimeout(() => {
-                                document.body.removeChild(a);
-                                window.URL.revokeObjectURL(url);
-                                downloadBtn.classList.remove('downloading');
-                                downloadBtn.innerHTML =
-                                    '<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>';
-                                setTimeout(() => {
-                                    downloadBtn.innerHTML =
-                                        '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
-                                }, 2000);
-                            }, 100);
-                        })
-                        .catch(() => {
-                            downloadBtn.classList.remove('downloading');
-                            downloadBtn.innerHTML =
-                                '<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-                            setTimeout(() => {
-                                downloadBtn.innerHTML =
-                                    '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
-                            }, 2000);
-                        });
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>';
+                    setTimeout(() => {
+                        downloadBtn.innerHTML =
+                            '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
+                    }, 2000);
                 }
             };
 
@@ -2363,7 +2343,7 @@
                         calculateParams();
                     }
                 }, 300);
-                console.log('[系统] 愉悦分析 Pro 已就绪 (图片加载已修复)');
+                console.log('[系统] 愉悦分析 Pro 已就绪 (CSP+下载已修复)');
             }
 
             if (document.readyState === 'loading') {
