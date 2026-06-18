@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>风景集 · 愉悦分析 Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- 安全策略 (CSP) 允许内联样式和脚本，但通过 nonce 或 hash 控制；这里用 meta 限制资源 -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        style-src 'unsafe-inline' https://fonts.googleapis.com;
+        font-src https://fonts.gstatic.com;
+        img-src 'self' https://picsum.photos data:;
+        script-src 'unsafe-inline' 'unsafe-eval';
+        connect-src 'self' https://picsum.photos;
+    " />
+    <style>
+        /* ===== 全局变量 & 重置 ===== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-bg-strong: rgba(255, 255, 255, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.45);
+            --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.08), 0 2px 12px rgba(0, 0, 0, 0.04);
+            --glass-shadow-lg: 0 16px 56px rgba(0, 0, 0, 0.10), 0 4px 20px rgba(0, 0, 0, 0.05);
+            --blur-amount: 24px;
+            --blur-amount-strong: 40px;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
+            --accent-light: #e8f4fd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --text-tertiary: #aeaeb2;
+            --surface-bg: #f5f5f7;
+            --success: #34c759;
+            --warning: #ff9f0a;
+            --danger: #ff3b30;
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            --shadow-color: rgba(0, 0, 0, 0.06);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-touch-callout: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: -0.01em;
+            transition: background 0.3s ease;
+        }
+
+        /* ===== 通用玻璃卡片 ===== */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition);
+        }
+        .glass-card:hover {
+            box-shadow: var(--glass-shadow-lg);
+            transform: translateY(-2px);
+        }
+        .glass-card-strong {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(var(--blur-amount-strong));
+            -webkit-backdrop-filter: blur(var(--blur-amount-strong));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--glass-shadow-lg);
+            transition: var(--transition);
+        }
+
+        /* ===== 玻璃按钮 ===== */
+        .glass-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: var(--font-stack);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .glass-btn:hover::after {
+            opacity: 1;
+        }
+        .glass-btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(0, 113, 227, 0.25);
+        }
+        .glass-btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 6px 24px rgba(0, 113, 227, 0.35);
+            transform: translateY(-2px);
+        }
+        .glass-btn-primary:active {
+            transform: scale(0.96);
+        }
+        .glass-btn-secondary {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+        .glass-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        .glass-btn-danger {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: rgba(255, 59, 48, 0.25);
+            color: var(--danger);
+        }
+        .glass-btn-danger:hover {
+            background: rgba(255, 59, 48, 0.18);
+            transform: translateY(-2px);
+        }
+        .glass-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(0.2);
+            transform: none !important;
+        }
+
+        /* ===== 玻璃输入 ===== */
+        .glass-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+            outline: none;
+            letter-spacing: -0.01em;
+            font-family: var(--font-stack);
+        }
+        .glass-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+            background: rgba(255, 255, 255, 0.75);
+        }
+        .glass-input::placeholder {
+            color: var(--text-tertiary);
+            opacity: 0.6;
+        }
+        .glass-select {
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236e6e73' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        /* ===== 游戏手柄光标 ===== */
+        #gamepadCursor {
+            position: fixed;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 2.5px solid rgba(0, 113, 227, 0.6);
+            pointer-events: none;
+            z-index: 99999;
+            display: none;
+            box-shadow: 0 0 24px rgba(0, 113, 227, 0.25), 0 0 8px rgba(0, 113, 227, 0.15);
+            transition: transform 0.04s linear;
+            will-change: transform;
+        }
+        #gamepadCursor.active {
+            display: block;
+        }
+        #gamepadCursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        /* ===== Toast ===== */
+        .gamepad-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(var(--blur-amount-strong));
+            -webkit-backdrop-filter: blur(var(--blur-amount-strong));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            padding: 16px 24px;
+            z-index: 100000;
+            display: none;
+            box-shadow: var(--glass-shadow-lg);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            animation: slideInRight 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+            max-width: 90vw;
+        }
+        .gamepad-toast.show {
+            display: block;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== 主视图 ===== */
+        #landscapeView {
+            min-height: 100vh;
+            background: var(--surface-bg);
+            position: relative;
+        }
+        .landscape-header {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(var(--blur-amount-strong));
+            -webkit-backdrop-filter: blur(var(--blur-amount-strong));
+            border-bottom: 1px solid var(--glass-border);
+            padding: 18px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+        }
+        .landscape-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #1d1d1f 0%, #3a3a3c 50%, #636366 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .landscape-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+        .landscape-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+            margin-top: 28px;
+        }
+
+        /* ===== 图片卡片 ===== */
+        .image-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition-spring);
+            cursor: pointer;
+            will-change: transform;
+        }
+        .image-card:hover,
+        .image-card.gamepad-hover {
+            transform: translateY(-8px);
+            box-shadow: var(--glass-shadow-lg);
+        }
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            overflow: hidden;
+            background: #e8e8ed;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .image-card:hover .image-wrapper img {
+            transform: scale(1.06);
+        }
+        .image-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        .image-loading.spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e0e5;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            font-size: 0;
+            color: transparent;
+        }
+        .image-loading.retrying {
+            animation: retryPulse 1.2s ease-in-out infinite;
+            color: var(--warning);
+            font-size: 0.85rem;
+        }
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+        @keyframes retryPulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1.08);
+            }
+        }
+        .retry-info {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 159, 10, 0.9);
+            color: #fff;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 10;
+            letter-spacing: 0;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(16px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== 下载按钮 ===== */
+        .download-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition-spring);
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        .download-btn.show {
+            display: flex;
+            animation: downloadBtnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes downloadBtnAppear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .download-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--glass-shadow-lg);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .download-btn:active {
+            transform: scale(0.93);
+        }
+        .download-btn.downloading {
+            animation: downloadPulse 1s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes downloadPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .image-info {
+            padding: 18px 20px;
+        }
+        .image-author {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+        }
+        .image-dimensions {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+
+        /* ===== 刷新按钮 ===== */
+        .refresh-btn {
+            position: fixed;
+            bottom: 36px;
+            right: 36px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(var(--blur-amount-strong));
+            -webkit-backdrop-filter: blur(var(--blur-amount-strong));
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: var(--glass-shadow-lg);
+            transition: var(--transition-spring);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .refresh-btn:hover,
+        .refresh-btn.gamepad-hover {
+            transform: rotate(180deg) scale(1.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+        .refresh-btn:active {
+            transform: rotate(180deg) scale(0.92);
+        }
+        .refresh-btn .icon-refresh {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.6s ease;
+        }
+        .refresh-btn:hover .icon-refresh {
+            transform: rotate(180deg);
+        }
+
+        /* ===== Footer ===== */
+        .landscape-footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-top: 1px solid var(--glass-border);
+            padding: 28px;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 60px;
+            font-size: 0.88rem;
+            letter-spacing: -0.01em;
+        }
+        .landscape-footer p {
+            margin: 4px 0;
+        }
+
+        /* ===== 石头 modal ===== */
+        .stone-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        .stone-modal.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .stone-shape {
+            width: 110px;
+            height: 90px;
+            background: linear-gradient(145deg, #b0b0b8 0%, #8e8e93 30%, #7a7a80 60%, #636366 100%);
+            border-radius: 52% 48% 56% 44% / 46% 54% 42% 58%;
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.35), inset 0 -6px 16px rgba(0, 0, 0, 0.2), inset 0 4px 12px rgba(255, 255, 255, 0.25);
+            animation: stoneDrop 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .stone-shape::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 22%;
+            width: 28%;
+            height: 18%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: rotate(-20deg);
+        }
+        @keyframes stoneDrop {
+            0% {
+                transform: translateY(-500px) rotate(0deg);
+                opacity: 0;
+            }
+            55% {
+                transform: translateY(0) rotate(360deg);
+                opacity: 1;
+            }
+            65% {
+                transform: translateY(-45px) rotate(380deg);
+            }
+            75% {
+                transform: translateY(0) rotate(360deg);
+            }
+            85% {
+                transform: translateY(-16px) rotate(370deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .hidden-stone {
+            position: fixed;
+            bottom: 108px;
+            right: 36px;
+            width: 44px;
+            height: 38px;
+            cursor: pointer;
+            z-index: 60;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            background: linear-gradient(145deg, #b0b0b8 0%, #8e8e93 30%, #7a7a80 60%, #636366 100%);
+            border-radius: 54% 46% 58% 42% / 44% 56% 40% 60%;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 -3px 8px rgba(0, 0, 0, 0.15), inset 0 2px 6px rgba(255, 255, 255, 0.2);
+            transition: var(--transition-spring);
+        }
+        .hidden-stone.visible {
+            display: block;
+        }
+        .hidden-stone:hover {
+            transform: scale(1.15);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3), inset 0 -3px 8px rgba(0, 0, 0, 0.15), inset 0 2px 6px rgba(255, 255, 255, 0.2);
+        }
+        .hidden-stone::after {
+            content: '';
+            position: absolute;
+            top: 16%;
+            left: 20%;
+            width: 24%;
+            height: 16%;
+            background: rgba(255, 255, 255, 0.28);
+            border-radius: 50%;
+            transform: rotate(-22deg);
+        }
+
+        /* ===== App 视图 ===== */
+        #appView {
+            display: none;
+        }
+        #appView.active {
+            display: block;
+        }
+        body.app-mode {
+            background: linear-gradient(160deg, #f0f0f5 0%, #e8e8f0 30%, #f5f5f7 60%, #eaeaf2 100%);
+            padding: 16px;
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .exit-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 22px;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(var(--blur-amount-strong));
+            -webkit-backdrop-filter: blur(var(--blur-amount-strong));
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition);
+            letter-spacing: -0.01em;
+            font-family: var(--font-stack);
+        }
+        .exit-btn:hover,
+        .exit-btn.gamepad-hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glass-shadow-lg);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .app-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding-top: 20px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--glass-shadow-lg);
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #1d1d1f 0%, #4a4a50 50%, #1d1d1f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .version {
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            letter-spacing: -0.01em;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-unit {
+            position: absolute;
+            right: 15px;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #34c759, #ffcc00, #ff3b30);
+            outline: none;
+            -webkit-appearance: none;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid rgba(0, 0, 0, 0.08);
+        }
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            cursor: pointer;
+            border: 2px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .toggle-section {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+        .toggle-section.active {
+            background: rgba(52, 199, 89, 0.08);
+            border-color: rgba(52, 199, 89, 0.25);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            transition: var(--transition);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .checkbox-wrapper input[type="checkbox"]:hover,
+        .checkbox-wrapper input[type="checkbox"].gamepad-hover {
+            border-color: var(--accent);
+            transform: scale(1.08);
+        }
+        .checkbox-wrapper input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .checkbox-wrapper input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 6px;
+            width: 6px;
+            height: 11px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .toggle-icon {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+        .toggle-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            display: inline-block;
+            transition: var(--transition);
+        }
+        .toggle-status.enabled {
+            color: #1d7a3d;
+            background: rgba(52, 199, 89, 0.1);
+        }
+
+        .settings-history {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .settings-history h4 {
+            margin-bottom: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .history-item {
+            background: rgba(255, 255, 255, 0.55);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .history-timestamp {
+            color: var(--text-tertiary);
+            font-size: 0.75rem;
+        }
+        .history-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-mini {
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-family: var(--font-stack);
+            letter-spacing: -0.01em;
+        }
+        .btn-restore {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-restore:hover {
+            background: var(--accent-hover);
+            transform: scale(1.04);
+        }
+        .btn-delete {
+            background: rgba(255, 59, 48, 0.15);
+            color: var(--danger);
+        }
+        .btn-delete:hover {
+            background: rgba(255, 59, 48, 0.25);
+            transform: scale(1.04);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius);
+            padding: 18px;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin: 6px 0;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            color: var(--text-tertiary);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 500;
+        }
+
+        .progress-container {
+            margin: 18px 0;
+        }
+        .progress-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #4a8fe7);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 4px;
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            animation: shimmer-progress 2s infinite;
+        }
+        @keyframes shimmer-progress {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .log-container {
+            height: 380px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(6px);
+            border-radius: var(--radius);
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .log-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .log-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .log-container::-webkit-scrollbar-thumb {
+            background: var(--text-tertiary);
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            padding: 9px 12px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .log-icon {
+            font-weight: 600;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            opacity: 0.7;
+            width: 28px;
+            text-align: center;
+        }
+        .log-insert {
+            background: rgba(255, 59, 48, 0.06);
+            border-left: 3px solid var(--danger);
+        }
+        .log-withdraw {
+            background: rgba(0, 113, 227, 0.05);
+            border-left: 3px solid var(--accent);
+        }
+        .log-info {
+            background: rgba(255, 159, 10, 0.05);
+            border-left: 3px solid var(--warning);
+        }
+        .log-success {
+            background: rgba(52, 199, 89, 0.06);
+            border-left: 3px solid var(--success);
+        }
+        .log-motivation {
+            background: rgba(175, 82, 222, 0.04);
+            border-left: 3px solid #af52de;
+        }
+
+        .safety-alert {
+            border: 2px solid;
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.3s ease;
+            font-size: 0.9rem;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .safety-alert.high {
+            background: rgba(52, 199, 89, 0.06);
+            border-color: var(--success);
+        }
+        .safety-alert.medium {
+            background: rgba(255, 159, 10, 0.05);
+            border-color: var(--warning);
+        }
+        .safety-alert.low {
+            background: rgba(255, 59, 48, 0.05);
+            border-color: var(--danger);
+        }
+        .safety-icon {
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .calculation-result {
+            background: rgba(0, 113, 227, 0.04);
+            border: 1px solid rgba(0, 113, 227, 0.2);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-top: 14px;
+            animation: slideDown 0.35s ease;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(0, 113, 227, 0.1);
+            font-size: 0.9rem;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .chart-container {
+            height: 180px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: var(--radius);
+            overflow-x: auto;
+        }
+        .chart-bar {
+            flex: 1;
+            min-width: 8px;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+        .chart-bar:hover {
+            opacity: 0.75;
+            transform: scaleY(1.04);
+        }
+
+        .health-report {
+            background: rgba(255, 159, 10, 0.05);
+            border: 2px solid rgba(255, 159, 10, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-top: 18px;
+            animation: slideDown 0.5s ease;
+        }
+        .health-report h3 {
+            margin-bottom: 14px;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+        .health-item {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            border-left: 3px solid var(--warning);
+            font-size: 0.88rem;
+        }
+
+        .care-tips {
+            background: rgba(0, 113, 227, 0.04);
+            border: 1px solid rgba(0, 113, 227, 0.15);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-top: 14px;
+        }
+        .care-tips h4 {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            letter-spacing: -0.01em;
+        }
+        .care-tips ul {
+            list-style: none;
+            padding: 0;
+        }
+        .care-tips li {
+            padding: 7px 0 7px 22px;
+            position: relative;
+            font-size: 0.85rem;
+        }
+        .care-tips li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 7px;
+            height: 7px;
+            border: 2px solid var(--accent);
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent);
+            animation: celebrate 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 1000;
+            letter-spacing: -0.04em;
+        }
+        @keyframes celebrate {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+            .landscape-title {
+                font-size: 1.8rem;
+            }
+            .logo {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body.app-mode {
+                padding: 10px;
+            }
+            .app-container {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .card {
+                padding: 20px;
+            }
+            .logo {
+                font-size: 1.4rem;
+            }
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .landscape-title {
+                font-size: 1.5rem;
+            }
+            .landscape-container {
+                padding: 20px 10px;
+            }
+            .refresh-btn {
+                width: 46px;
+                height: 46px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 1.2rem;
+            }
+            .hidden-stone {
+                bottom: 80px;
+                right: 20px;
+                width: 36px;
+                height: 30px;
+            }
+            .exit-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 18px;
+                font-size: 0.82rem;
+            }
+            .stat-card {
+                padding: 14px;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            .log-container {
+                height: 280px;
+                font-size: 0.75rem;
+            }
+            .gamepad-toast {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 12px 18px;
+                font-size: 0.85rem;
+            }
+            #gamepadCursor {
+                width: 42px;
+                height: 42px;
+            }
+            .download-btn {
+                width: 36px;
+                height: 36px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landscape-title {
+                font-size: 1.3rem;
+            }
+            .logo {
+                font-size: 1.2rem;
+            }
+            .glass-btn {
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+            .form-group label {
+                font-size: 0.82rem;
+            }
+            .glass-input {
+                padding: 11px 14px;
+                font-size: 0.88rem;
+            }
+            .history-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .history-actions {
+                justify-content: flex-end;
+            }
+        }
+
+        /* ===== 微交互 ===== */
+        .fade-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .scale-on-hover {
+            transition: transform 0.2s ease;
+        }
+        .scale-on-hover:hover {
+            transform: scale(1.02);
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-tertiary);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* 选中高亮 */
+        .gamepad-hover {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: inherit;
+        }
+
+        /* 加载骨架 */
+        .skeleton {
+            background: linear-gradient(90deg, #e8e8ed 25%, #f0f0f5 50%, #e8e8ed 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+        }
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== DOM 元素 ===== -->
+    <div id="gamepadCursor"></div>
+    <div class="gamepad-toast" id="gamepadToast"></div>
+    <div class="stone-modal" id="stoneModal">
+        <div class="stone-shape"></div>
+    </div>
+    <div class="hidden-stone" id="hiddenStone"></div>
+
+    <!-- ===== 主视图: 风景集 ===== -->
+    <div id="landscapeView">
+        <div class="landscape-header">
+            <h1 class="landscape-title">风景集</h1>
+            <p class="landscape-subtitle">探索来自世界各地的绝美自然摄影</p>
+        </div>
+        <div class="landscape-container">
+            <div class="gallery-grid" id="gallery"></div>
+        </div>
+        <button class="refresh-btn" id="refreshBtn" aria-label="刷新画廊">
+            <svg class="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <div class="landscape-footer">
+            <p>图片由 Lorem Picsum 提供 · 每次刷新都有新惊喜</p>
+            <p style="margin-top:8px;font-size:0.82rem;">&copy; <span id="yearTrigger" style="cursor:default;transition:color 0.2s;">2025</span> 风景集. 保留所有权利。</p>
+        </div>
+    </div>
+
+    <!-- ===== App 视图: 愉悦分析 Pro ===== -->
+    <div id="appView">
+        <button class="exit-btn" id="exitAppBtn">返回画廊</button>
+        <div class="app-container">
+            <div class="card full-width">
+                <header>
+                    <div class="logo">愉悦分析 Pro</div>
+                    <div class="version">版本 5.0 · 智能计算 · 记忆配置 · 健康监测</div>
+                </header>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom:18px;font-weight:600;font-size:1.1rem;letter-spacing:-0.02em;">设置</h2>
+
+                <div class="toggle-section" id="lubeSection">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="useLube" />
+                        <div class="checkbox-label"><span class="toggle-icon">&#8226;</span><span>使用润滑液</span></div>
+                    </label>
+                    <div class="toggle-status" id="lubeStatus">未使用润滑液</div>
+                </div>
+
+                <div class="toggle-section" id="tipsSection">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="showMotivation" checked />
+                        <div class="checkbox-label"><span class="toggle-icon">&#8226;</span><span>鼓励提示</span></div>
+                    </label>
+                    <div class="toggle-status enabled" id="motivationStatus">已启用</div>
+                </div>
+
+                <div class="form-group">
+                    <label>玩具长度 (cm)</label>
+                    <div class="input-wrapper">
+                        <input type="number" class="glass-input" id="toyLength" min="1" max="150" step="0.1" value="15" />
+                        <span class="input-unit">cm</span>
+                    </div>
+                    <input type="range" class="range-slider" id="lengthSlider" min="1" max="150" step="0.1" value="15" />
+                </div>
+
+                <div class="form-group">
+                    <label>玩具直径 (cm)</label>
+                    <div class="input-wrapper">
+                        <input type="number" class="glass-input" id="toyDiameter" min="0.5" max="10" step="0.1" value="3" />
+                        <span class="input-unit">cm</span>
+                    </div>
+                    <input type="range" class="range-slider" id="diameterSlider" min="0.5" max="10" step="0.1" value="3" />
+                </div>
+
+                <div class="form-group">
+                    <label>总循环次数</label>
+                    <div class="input-wrapper">
+                        <input type="number" class="glass-input" id="totalCount" min="2" max="100" step="2" value="10" />
+                        <span class="input-unit">次</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>经验水平</label>
+                    <select class="glass-input glass-select" id="experience">
+                        <option value="beginner">初级</option>
+                        <option value="intermediate" selected>中级</option>
+                        <option value="advanced">高级</option>
+                        <option value="expert">专家级</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button class="glass-btn glass-btn-secondary" id="calculateBtn">计算</button>
+                    <button class="glass-btn glass-btn-primary" id="startBtn" disabled>开始进程</button>
+                </div>
+
+                <div id="calculationResult" class="hidden"></div>
+                <div id="safetyAlert" class="hidden"></div>
+
+                <div class="settings-history hidden" id="settingsHistory">
+                    <h4>历史设置</h4>
+                    <div id="historyList"></div>
+                    <div style="text-align:center;margin-top:10px;">
+                        <button class="btn-mini" id="clearHistoryBtn" style="background:#8e8e93;color:#fff;">清空全部</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom:18px;font-weight:600;font-size:1.1rem;letter-spacing:-0.02em;">实时统计</h2>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+                    <div class="stat-card"><div class="stat-label">已用时间</div><div class="stat-value" id="timer">00:00:00</div></div>
+                    <div class="stat-card"><div class="stat-label">进度</div><div class="stat-value" id="progress">0%</div></div>
+                    <div class="stat-card"><div class="stat-label">进入次数</div><div class="stat-value" id="insertCount">0</div></div>
+                    <div class="stat-card"><div class="stat-label">剩余时间</div><div class="stat-value" id="remaining">--:--</div></div>
+                </div>
+                <div class="progress-container"><div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div></div>
+                <div class="btn-group hidden" id="controlButtons">
+                    <button class="glass-btn glass-btn-secondary" id="pauseBtn"><span id="pauseText">暂停</span></button>
+                    <button class="glass-btn glass-btn-danger" id="stopBtn">停止</button>
+                </div>
+                <div style="margin-top:18px;">
+                    <h3 style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:8px;font-weight:500;">进程历史</h3>
+                    <div class="chart-container" id="historyChart"><div style="text-align:center;width:100%;color:var(--text-tertiary);">暂无数据</div></div>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2 style="margin-bottom:14px;font-weight:600;font-size:1.1rem;letter-spacing:-0.02em;">活动日志</h2>
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry log-info"><span class="log-icon">[i]</span><span>系统就绪 — 您的设置将自动保存</span></div>
+                </div>
+                <div id="healthReport" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================
+         *  愉悦分析 Pro · 完整模块 (ES6 IIFE)
+         *  安全性 · 可维护性 · UI 细节优化
+         * ============================================================
+         */
+        (() => {
+            'use strict';
+
+            // ===== 常量 ==============================================
+            const MOTIVATION_MESSAGES = [
+                '继续保持——保持平稳轻柔的节奏。',
+                '你做得非常好。保持放松。',
+                '深呼吸，让身体自然放松。',
+                '感受每一个瞬间——享受当下。',
+                '很棒的节奏。继续保持这个舒适的速度。',
+                '你的身体适应得很完美。干得漂亮。',
+                '放松肌肉，让一切顺其自然。',
+                '轻柔而耐心——这样刚刚好。',
+                '你在很好地照顾自己。',
+                '坚持下去。你做得非常出色。'
+            ];
+
+            const EXP_MULTIPLIER = Object.freeze({
+                beginner: 1.5,
+                intermediate: 1.0,
+                advanced: 0.7,
+                expert: 0.5
+            });
+
+            const EXP_LABELS = Object.freeze({
+                beginner: '初级',
+                intermediate: '中级',
+                advanced: '高级',
+                expert: '专家级'
+            });
+
+            const STORAGE_KEYS = {
+                CURRENT: 'pa_curr',
+                SETTINGS_HIST: 'pa_setHist',
+                SESS_HIST: 'pa_sessHist'
+            };
+
+            // ===== DOM 引用 ==========================================
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const DOM = {
+                gallery: $('#gallery'),
+                refreshBtn: $('#refreshBtn'),
+                yearTrigger: $('#yearTrigger'),
+                stoneModal: $('#stoneModal'),
+                hiddenStone: $('#hiddenStone'),
+                appView: $('#appView'),
+                landscapeView: $('#landscapeView'),
+                exitAppBtn: $('#exitAppBtn'),
+
+                // 设置
+                useLube: $('#useLube'),
+                showMotivation: $('#showMotivation'),
+                toyLength: $('#toyLength'),
+                lengthSlider: $('#lengthSlider'),
+                toyDiameter: $('#toyDiameter'),
+                diameterSlider: $('#diameterSlider'),
+                totalCount: $('#totalCount'),
+                experience: $('#experience'),
+                calculateBtn: $('#calculateBtn'),
+                startBtn: $('#startBtn'),
+                lubeStatus: $('#lubeStatus'),
+                motivationStatus: $('#motivationStatus'),
+                lubeSection: $('#lubeSection'),
+                tipsSection: $('#tipsSection'),
+                calculationResult: $('#calculationResult'),
+                safetyAlert: $('#safetyAlert'),
+                settingsHistory: $('#settingsHistory'),
+                historyList: $('#historyList'),
+                clearHistoryBtn: $('#clearHistoryBtn'),
+
+                // 统计
+                timer: $('#timer'),
+                progress: $('#progress'),
+                insertCount: $('#insertCount'),
+                remaining: $('#remaining'),
+                progressBar: $('#progressBar'),
+                controlButtons: $('#controlButtons'),
+                pauseBtn: $('#pauseBtn'),
+                pauseText: $('#pauseText'),
+                stopBtn: $('#stopBtn'),
+                historyChart: $('#historyChart'),
+
+                // 日志
+                logContainer: $('#logContainer'),
+                healthReport: $('#healthReport'),
+
+                // 手柄
+                gamepadCursor: $('#gamepadCursor'),
+                gamepadToast: $('#gamepadToast'),
+            };
+
+            // ===== 工具函数 ==========================================
+            function formatTime(seconds) {
+                const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                return `${h}:${m}:${s}`;
+            }
+
+            function sleep(ms) {
+                return new Promise(r => setTimeout(r, ms));
+            }
+
+            function clamp(val, min, max) {
+                return Math.min(Math.max(val, min), max);
+            }
+
+            function sanitizeInput(value) {
+                const str = String(value).trim();
+                return str.replace(/[<>'"`]/g, ''); // 简单 XSS 防护
+            }
+
+            function getExpText(exp) {
+                return EXP_LABELS[exp] || exp;
+            }
+
+            function getSafetyColor(score) {
+                if (score >= 80) return 'var(--success)';
+                if (score >= 60) return '#ff9f0a';
+                if (score >= 40) return '#ed8936';
+                return 'var(--danger)';
+            }
+
+            function getSafetyLevel(score) {
+                if (score >= 80) return 'high';
+                if (score >= 50) return 'medium';
+                return 'low';
+            }
+
+            // ===== 存储模块 ==========================================
+            const Storage = {
+                isAvailable() {
+                    try {
+                        const t = '__storage_test__';
+                        localStorage.setItem(t, t);
+                        localStorage.removeItem(t);
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                },
+                save(key, data) {
+                    if (!this.isAvailable()) return false;
+                    try {
+                        localStorage.setItem(key, JSON.stringify(data));
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                },
+                load(key, fallback = null) {
+                    if (!this.isAvailable()) return fallback;
+                    try {
+                        const raw = localStorage.getItem(key);
+                        return raw ? JSON.parse(raw) : fallback;
+                    } catch {
+                        return fallback;
+                    }
+                },
+                remove(key) {
+                    if (!this.isAvailable()) return false;
+                    try {
+                        localStorage.removeItem(key);
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                }
+            };
+
+            // ===== 配置状态 ==========================================
+            const config = {
+                length: 15,
+                diameter: 3,
+                useLube: false,
+                showMotivation: true,
+                totalCount: 10,
+                experience: 'intermediate',
+                actionDelay: 0,
+                safetyScore: 100,
+                originalDelay: 0
+            };
+
+            // ===== 会话状态 ==========================================
+            const session = {
+                isRunning: false,
+                isPaused: false,
+                currentCycle: 0,
+                insertions: 0,
+                startTime: 0,
+                pauseTime: 0,
+                totalPauseTime: 0,
+                intervalId: null,
+                timerIntervalId: null,
+                motivationShown: 0,
+                isComplete: false
+            };
+
+            let sessionHistory = [];
+
+            // ===== DOM 事件绑定 (安全, 无内联) ========================
+            function bindEvents() {
+                // 年份点击 -> 石头彩蛋
+                DOM.yearTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const count = parseInt(DOM.yearTrigger.dataset.clickCount || '0') + 1;
+                    DOM.yearTrigger.dataset.clickCount = count;
+                    if (count >= 10) {
+                        showStoneModal();
+                        DOM.yearTrigger.dataset.clickCount = '0';
+                    }
+                });
+
+                // 隐藏石头点击 -> 进入 App
+                DOM.hiddenStone.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!window._stoneVisible) return;
+                    const count = parseInt(DOM.hiddenStone.dataset.clickCount || '0') + 1;
+                    DOM.hiddenStone.dataset.clickCount = count;
+                    if (count >= 10) {
+                        enterApp();
+                        DOM.hiddenStone.dataset.clickCount = '0';
+                        DOM.hiddenStone.classList.remove('visible');
+                        window._stoneVisible = false;
+                    }
+                });
+
+                // 刷新画廊
+                DOM.refreshBtn.addEventListener('click', loadGallery);
+
+                // 退出 App
+                DOM.exitAppBtn.addEventListener('click', exitApp);
+
+                // 滑块同步
+                DOM.lengthSlider.addEventListener('input', (e) => {
+                    DOM.toyLength.value = e.target.value;
+                    saveSettings();
+                });
+                DOM.toyLength.addEventListener('input', (e) => {
+                    let val = parseFloat(e.target.value) || 0;
+                    val = clamp(val, 1, 150);
+                    DOM.lengthSlider.value = val;
+                    saveSettings();
+                });
+
+                DOM.diameterSlider.addEventListener('input', (e) => {
+                    DOM.toyDiameter.value = e.target.value;
+                    saveSettings();
+                });
+                DOM.toyDiameter.addEventListener('input', (e) => {
+                    let val = parseFloat(e.target.value) || 0;
+                    val = clamp(val, 0.5, 10);
+                    DOM.diameterSlider.value = val;
+                    saveSettings();
+                });
+
+                // 复选框
+                DOM.useLube.addEventListener('change', toggleLube);
+                DOM.showMotivation.addEventListener('change', toggleMotivation);
+
+                // 其他设置变更自动保存
+                DOM.totalCount.addEventListener('change', saveSettings);
+                DOM.experience.addEventListener('change', saveSettings);
+
+                // 计算按钮
+                DOM.calculateBtn.addEventListener('click', calculateParams);
+
+                // 开始 / 暂停 / 停止
+                DOM.startBtn.addEventListener('click', startSession);
+                DOM.pauseBtn.addEventListener('click', pauseSession);
+                DOM.stopBtn.addEventListener('click', stopSession);
+
+                // 清空历史
+                DOM.clearHistoryBtn.addEventListener('click', clearAllHistory);
+
+                // 键盘快捷键: ESC 退出 App
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && DOM.appView.classList.contains('active')) {
+                        exitApp();
+                    }
+                });
+
+                // 窗口尺寸变化时更新手柄光标位置
+                window.addEventListener('resize', () => {
+                    if (GamepadController._active) {
+                        const c = DOM.gamepadCursor;
+                        GamepadController._cursorX = clamp(GamepadController._cursorX, 0, window.innerWidth);
+                        GamepadController._cursorY = clamp(GamepadController._cursorY, 0, window.innerHeight);
+                        c.style.left = GamepadController._cursorX + 'px';
+                        c.style.top = GamepadController._cursorY + 'px';
+                    }
+                });
+            }
+
+            // ===== 图片加载管理器 (增强) ==============================
+            const ImageLoadManager = {
+                maxRetries: 3,
+                retryDelay: 2000,
+                _retrying: new Map(),
+
+                createCard(id, container) {
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.dataset.imageId = id;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'image-wrapper';
+
+                    const loading = document.createElement('div');
+                    loading.className = 'image-loading spinner';
+                    wrapper.appendChild(loading);
+
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'download-btn';
+                    downloadBtn.title = '下载图片';
+                    downloadBtn.innerHTML =
+                        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+                    downloadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this._downloadImage(img, id);
+                    });
+                    wrapper.appendChild(downloadBtn);
+
+                    const img = document.createElement('img');
+                    img.src = `https://picsum.photos/id/${id}/400/300`;
+                    img.alt = '风景照片';
+                    img.style.display = 'none';
+                    img.loading = 'lazy';
+
+                    img.addEventListener('load', () => {
+                        loading.style.display = 'none';
+                        img.style.display = 'block';
+                        this._retrying.delete(id);
+                        setTimeout(() => downloadBtn.classList.add('show'), 300);
+                    });
+
+                    img.addEventListener('error', () => {
+                        this._handleError(img, loading, id, 1, downloadBtn);
+                    });
+
+                    wrapper.appendChild(img);
+                    card.appendChild(wrapper);
+
+                    const info = document.createElement('div');
+                    info.className = 'image-info';
+                    info.innerHTML =
+                        `<div class="image-author">图片 #${id}</div><div class="image-dimensions">400 × 300 px</div>`;
+                    card.appendChild(info);
+
+                    container.appendChild(card);
+                },
+
+                _handleError(img, loading, originalId, attempt, downloadBtn) {
+                    downloadBtn.classList.remove('show');
+                    if (attempt > this.maxRetries) {
+                        loading.classList.remove('spinner', 'retrying');
+                        loading.textContent = '加载失败';
+                        loading.style.fontSize = '0.85rem';
+                        loading.style.color = 'var(--danger)';
+                        this._retrying.delete(originalId);
+                        setTimeout(() => {
+                            const newId = Math.floor(Math.random() * 1000);
+                            this._retryWithNewId(img, loading, newId, downloadBtn);
+                        }, 5000);
+                        return;
+                    }
+                    loading.classList.remove('spinner');
+                    loading.classList.add('retrying');
+                    loading.textContent = '重试中...';
+                    const wrapper = img.parentElement;
+                    let infoEl = wrapper.querySelector('.retry-info');
+                    if (!infoEl) {
+                        infoEl = document.createElement('div');
+                        infoEl.className = 'retry-info';
+                        wrapper.appendChild(infoEl);
+                    }
+                    infoEl.textContent = `尝试加载 ${attempt}/${this.maxRetries}`;
+                    this._retrying.set(originalId, attempt);
+
+                    setTimeout(() => {
+                        const newId = Math.floor(Math.random() * 1000);
+                        img.src = `https://picsum.photos/id/${newId}/400/300?t=${Date.now()}`;
+                        img.addEventListener('error', () => {
+                            this._handleError(img, loading, originalId, attempt + 1, downloadBtn);
+                        }, { once: true });
+                        img.addEventListener('load', () => {
+                            loading.style.display = 'none';
+                            img.style.display = 'block';
+                            if (infoEl) infoEl.remove();
+                            this._retrying.delete(originalId);
+                            setTimeout(() => downloadBtn.classList.add('show'), 300);
+                            const card = img.closest('.image-card');
+                            const author = card.querySelector('.image-author');
+                            if (author) author.textContent = `图片 #${newId}`;
+                            card.dataset.imageId = newId;
+                        }, { once: true });
+                    }, this.retryDelay);
+                },
+
+                _retryWithNewId(img, loading, newId, downloadBtn) {
+                    loading.classList.add('spinner');
+                    loading.classList.remove('retrying');
+                    loading.textContent = '';
+                    loading.style.fontSize = '';
+                    loading.style.color = '';
+                    img.style.display = 'none';
+                    downloadBtn.classList.remove('show');
+                    const wrapper = img.parentElement;
+                    const infoEl = wrapper.querySelector('.retry-info');
+                    if (infoEl) infoEl.textContent = '重新加载中...';
+                    img.src = `https://picsum.photos/id/${newId}/400/300?t=${Date.now()}`;
+                    img.addEventListener('load', () => {
+                        loading.style.display = 'none';
+                        img.style.display = 'block';
+                        if (infoEl) infoEl.remove();
+                        setTimeout(() => downloadBtn.classList.add('show'), 300);
+                        const card = img.closest('.image-card');
+                        const author = card.querySelector('.image-author');
+                        if (author) author.textContent = `图片 #${newId}`;
+                        card.dataset.imageId = newId;
+                    }, { once: true });
+                    img.addEventListener('error', () => {
+                        this._handleError(img, loading, newId, 1, downloadBtn);
+                    }, { once: true });
+                },
+
+                _downloadImage(img, imageId) {
+                    const btn = img.parentElement.querySelector('.download-btn');
+                    btn.classList.add('downloading');
+                    btn.innerHTML =
+                        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin-continuous 0.7s linear infinite;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 10"/></svg>`;
+                    fetch(img.src)
+                        .then(res => {
+                            if (!res.ok) throw new Error('Network error');
+                            return res.blob();
+                        })
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `风景-${imageId}-${Date.now()}.jpg`;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => {
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(url);
+                                btn.classList.remove('downloading');
+                                btn.innerHTML =
+                                    `<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>`;
+                                setTimeout(() => {
+                                    btn.innerHTML =
+                                        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+                                }, 2000);
+                            }, 100);
+                        })
+                        .catch(() => {
+                            btn.classList.remove('downloading');
+                            btn.innerHTML =
+                                `<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+                            setTimeout(() => {
+                                btn.innerHTML =
+                                    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+                            }, 2000);
+                        });
+                }
+            };
+
+            // ===== 画廊加载 ==========================================
+            function loadGallery() {
+                const gallery = DOM.gallery;
+                gallery.innerHTML = '';
+                for (let i = 0; i < 12; i++) {
+                    const id = Math.floor(Math.random() * 1000);
+                    ImageLoadManager.createCard(id, gallery);
+                }
+            }
+
+            // ===== 石头彩蛋 ==========================================
+            function showStoneModal() {
+                const modal = DOM.stoneModal;
+                modal.classList.add('active');
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                    DOM.hiddenStone.classList.add('visible');
+                    window._stoneVisible = true;
+                }, 2000);
+            }
+
+            // ===== App 切换 ==========================================
+            function enterApp() {
+                DOM.landscapeView.style.display = 'none';
+                DOM.appView.classList.add('active');
+                document.body.classList.add('app-mode');
+                loadSettings();
+                loadSessionHistory();
+                displaySettingsHistory();
+            }
+
+            function exitApp() {
+                // 清理会话
+                if (session.isRunning) {
+                    stopSession();
+                }
+                if (session.timerIntervalId) {
+                    clearInterval(session.timerIntervalId);
+                    session.timerIntervalId = null;
+                }
+                DOM.landscapeView.style.display = 'block';
+                DOM.appView.classList.remove('active');
+                document.body.classList.remove('app-mode');
+                DOM.hiddenStone.classList.remove('visible');
+                window._stoneVisible = false;
+                // 重置计数
+                DOM.yearTrigger.dataset.clickCount = '0';
+                DOM.hiddenStone.dataset.clickCount = '0';
+            }
+
+            // ===== 设置加载/保存 ======================================
+            function loadSettings() {
+                const saved = Storage.load(STORAGE_KEYS.CURRENT);
+                if (saved) {
+                    Object.assign(config, saved);
+                    DOM.toyLength.value = config.length;
+                    DOM.lengthSlider.value = config.length;
+                    DOM.toyDiameter.value = config.diameter;
+                    DOM.diameterSlider.value = config.diameter;
+                    DOM.totalCount.value = config.totalCount;
+                    DOM.experience.value = config.experience;
+                    DOM.useLube.checked = config.useLube;
+                    DOM.showMotivation.checked = config.showMotivation;
+                    updateLubeUI();
+                    updateMotivationUI();
+                }
+            }
+
+            function saveSettings() {
+                config.length = parseFloat(DOM.toyLength.value) || 1;
+                config.diameter = parseFloat(DOM.toyDiameter.value) || 0.5;
+                config.totalCount = parseInt(DOM.totalCount.value) || 10;
+                config.experience = DOM.experience.value;
+                // 确保偶数
+                if (config.totalCount % 2 !== 0) {
+                    config.totalCount++;
+                    DOM.totalCount.value = config.totalCount;
+                }
+                Storage.save(STORAGE_KEYS.CURRENT, config);
+            }
+
+            function toggleLube() {
+                config.useLube = DOM.useLube.checked;
+                updateLubeUI();
+                saveSettings();
+            }
+
+            function updateLubeUI() {
+                if (config.useLube) {
+                    DOM.lubeStatus.textContent = '已使用润滑液 -- 摩擦减少约 30%';
+                    DOM.lubeStatus.classList.add('enabled');
+                    DOM.lubeSection.classList.add('active');
+                } else {
+                    DOM.lubeStatus.textContent = '未使用润滑液';
+                    DOM.lubeStatus.classList.remove('enabled');
+                    DOM.lubeSection.classList.remove('active');
+                }
+            }
+
+            function toggleMotivation() {
+                config.showMotivation = DOM.showMotivation.checked;
+                updateMotivationUI();
+                saveSettings();
+            }
+
+            function updateMotivationUI() {
+                if (config.showMotivation) {
+                    DOM.motivationStatus.textContent = '已启用 -- 将显示鼓励提示';
+                    DOM.motivationStatus.classList.add('enabled');
+                    DOM.tipsSection.classList.add('active');
+                } else {
+                    DOM.motivationStatus.textContent = '已禁用';
+                    DOM.motivationStatus.classList.remove('enabled');
+                    DOM.tipsSection.classList.remove('active');
+                }
+            }
+
+            // ===== 历史记录 ==========================================
+            function saveToHistory() {
+                const snap = {
+                    length: config.length,
+                    diameter: config.diameter,
+                    totalCount: config.totalCount,
+                    experience: config.experience,
+                    useLube: config.useLube,
+                    showMotivation: config.showMotivation,
+                    timestamp: new Date().toISOString(),
+                    id: Date.now()
+                };
+                let hist = Storage.load(STORAGE_KEYS.SETTINGS_HIST, []);
+                hist.unshift(snap);
+                if (hist.length > 10) hist = hist.slice(0, 10);
+                Storage.save(STORAGE_KEYS.SETTINGS_HIST, hist);
+                displaySettingsHistory();
+                showLog('[已保存] 当前设置已存入历史记录', 'success');
+            }
+
+            function displaySettingsHistory() {
+                const hist = Storage.load(STORAGE_KEYS.SETTINGS_HIST, []);
+                if (!hist.length) {
+                    DOM.settingsHistory.classList.add('hidden');
+                    return;
+                }
+                DOM.settingsHistory.classList.remove('hidden');
+                DOM.historyList.innerHTML = '';
+                hist.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    const timeStr = new Date(item.timestamp).toLocaleString('zh-CN', {
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    div.innerHTML = `
+                        <div>
+                            <div>${item.length}cm × ${item.diameter}cm | ${item.totalCount} 循环 | ${getExpText(item.experience)}</div>
+                            <div>${item.useLube ? '使用润滑液' : '无润滑液'} | ${item.showMotivation ? '开启提示' : '关闭提示'}</div>
+                            <div class="history-timestamp">${timeStr}</div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-mini btn-restore" data-restore="${item.id}">恢复</button>
+                            <button class="btn-mini btn-delete" data-delete="${item.id}">删除</button>
+                        </div>
+                    `;
+                    DOM.historyList.appendChild(div);
+                });
+
+                // 事件委托
+                DOM.historyList.querySelectorAll('[data-restore]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.dataset.restore);
+                        restoreSettings(id);
+                    });
+                });
+                DOM.historyList.querySelectorAll('[data-delete]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.dataset.delete);
+                        deleteHistoryItem(id);
+                    });
+                });
+            }
+
+            function restoreSettings(id) {
+                const hist = Storage.load(STORAGE_KEYS.SETTINGS_HIST, []);
+                const item = hist.find(s => s.id === id);
+                if (!item) return;
+                Object.assign(config, item);
+                DOM.toyLength.value = config.length;
+                DOM.lengthSlider.value = config.length;
+                DOM.toyDiameter.value = config.diameter;
+                DOM.diameterSlider.value = config.diameter;
+                DOM.totalCount.value = config.totalCount;
+                DOM.experience.value = config.experience;
+                DOM.useLube.checked = config.useLube;
+                DOM.showMotivation.checked = config.showMotivation;
+                updateLubeUI();
+                updateMotivationUI();
+                saveSettings();
+                showLog('[已恢复] 设置已成功恢复', 'success');
+            }
+
+            function deleteHistoryItem(id) {
+                if (!confirm('确定要删除此记录吗？')) return;
+                let hist = Storage.load(STORAGE_KEYS.SETTINGS_HIST, []);
+                hist = hist.filter(i => i.id !== id);
+                Storage.save(STORAGE_KEYS.SETTINGS_HIST, hist);
+                displaySettingsHistory();
+                showLog('[已删除] 记录已移除', 'info');
+            }
+
+            function clearAllHistory() {
+                if (!confirm('确定要清空所有历史记录吗？此操作无法撤销。')) return;
+                Storage.remove(STORAGE_KEYS.SETTINGS_HIST);
+                displaySettingsHistory();
+                showLog('[已清空] 所有历史记录已清空', 'info');
+            }
+
+            // ===== 会话历史 ==========================================
+            function loadSessionHistory() {
+                sessionHistory = Storage.load(STORAGE_KEYS.SESS_HIST, []);
+                updateHistoryChart();
+            }
+
+            function saveSessionHistory() {
+                Storage.save(STORAGE_KEYS.SESS_HIST, sessionHistory);
+            }
+
+            function updateHistoryChart() {
+                const container = DOM.historyChart;
+                container.innerHTML = '';
+                if (!sessionHistory.length) {
+                    container.innerHTML = '<div style="text-align:center;width:100%;color:var(--text-tertiary);">暂无数据</div>';
+                    return;
+                }
+                const max = Math.max(...sessionHistory.map(h => h.insertions || 1));
+                const recent = sessionHistory.slice(-10);
+                recent.forEach(h => {
+                    const bar = document.createElement('div');
+                    bar.className = 'chart-bar';
+                    const pct = ((h.insertions || 0) / max) * 100;
+                    bar.style.height = Math.max(4, pct) + '%';
+                    bar.style.background = h.usedLube ?
+                        'linear-gradient(to top, var(--success), #30b350)' :
+                        'linear-gradient(to top, var(--danger), #e0352b)';
+                    bar.title = `${h.date || ''}\n进入 ${h.insertions || 0} 次\n耗时 ${formatTime(h.duration || 0)}\n${h.usedLube ? '已使用润滑液' : '未使用润滑液'}`;
+                    container.appendChild(bar);
+                });
+            }
+
+            // ===== 计算逻辑 ==========================================
+            function calculateParams() {
+                config.length = parseFloat(DOM.toyLength.value) || 1;
+                config.diameter = parseFloat(DOM.toyDiameter.value) || 0.5;
+                config.totalCount = parseInt(DOM.totalCount.value) || 10;
+                config.experience = DOM.experience.value;
+
+                if (config.length < 1 || config.length > 150) {
+                    showLog('[错误] 长度必须在 1-150 厘米之间', 'info');
+                    return;
+                }
+                if (config.diameter < 0.5 || config.diameter > 10) {
+                    showLog('[错误] 直径必须在 0.5-10 厘米之间', 'info');
+                    return;
+                }
+                if (config.totalCount % 2 !== 0) {
+                    config.totalCount++;
+                    DOM.totalCount.value = config.totalCount;
+                }
+
+                const mult = EXP_MULTIPLIER[config.experience] || 1.0;
+                let base = (config.length / 30) + (config.diameter / 3) + 1.2;
+                base *= mult;
+                config.originalDelay = base;
+                config.actionDelay = config.useLube ? base * 0.70 : base;
+
+                if (config.useLube) showLog('[润滑] 速度已提升约 30%', 'success');
+
+                let safety = 100;
+                if (config.length > 100) safety -= 20;
+                else if (config.length > 50) safety -= 10;
+                if (config.diameter > 6) safety -= 25;
+                else if (config.diameter > 4) safety -= 15;
+                else if (config.diameter > 3) safety -= 5;
+                if (config.experience === 'beginner' && config.diameter > 4) safety -= 10;
+                if (config.useLube) safety += 20;
+                else safety -= 25;
+                config.safetyScore = clamp(safety, 0, 100);
+
+                displayCalculationResults();
+                displaySafetyAlert();
+                saveToHistory();
+                DOM.startBtn.disabled = false;
+                showLog(`[成功] 计算完毕 -- 频率: ${config.actionDelay.toFixed(2)}秒/次`, 'success');
+            }
+
+            function displayCalculationResults() {
+                const totalTime = (config.totalCount * config.actionDelay / 60).toFixed(1);
+                DOM.calculationResult.innerHTML = `
+                    <div class="calculation-result">
+                        <h3 style="color:var(--accent);margin-bottom:12px;font-size:0.95rem;font-weight:600;">计算结果</h3>
+                        <div class="result-item"><span>循环频率:</span><span class="result-value">${config.actionDelay.toFixed(2)} 秒/次</span></div>
+                        <div class="result-item"><span>预计耗时:</span><span class="result-value">${totalTime} 分钟</span></div>
+                        <div class="result-item"><span>进入总数:</span><span class="result-value">${config.totalCount/2} 次</span></div>
+                        <div class="result-item"><span>安全评分:</span><span class="result-value" style="color:${getSafetyColor(config.safetyScore)}">${config.safetyScore}/100</span></div>
+                    </div>`;
+                DOM.calculationResult.classList.remove('hidden');
+            }
+
+            function displaySafetyAlert() {
+                const level = getSafetyLevel(config.safetyScore);
+                let icon = '[OK]',
+                    title = '安全级别: 良好',
+                    msg = '当前配置看起来很安全。';
+                if (level === 'medium') {
+                    icon = '[!]';
+                    title = '安全级别: 中等';
+                    msg = '建议使用润滑液并缓慢进行。';
+                } else if (level === 'low') {
+                    icon = '[!!]';
+                    title = '安全级别: 警告';
+                    msg = '强烈建议使用润滑液。请务必极慢地进行。';
+                }
+                DOM.safetyAlert.innerHTML =
+                    `<div class="safety-alert ${level}"><span class="safety-icon">${icon}</span><div><strong>${title}</strong><br>${msg}</div></div>`;
+                DOM.safetyAlert.classList.remove('hidden');
+            }
+
+            // ===== 会话控制 ==========================================
+            async function startSession() {
+                if (config.actionDelay === 0) {
+                    showLog('[错误] 请先点击计算按钮', 'info');
+                    return;
+                }
+                // 重置会话
+                Object.assign(session, {
+                    isRunning: true,
+                    isPaused: false,
+                    currentCycle: 0,
+                    insertions: 0,
+                    startTime: performance.now(),
+                    pauseTime: 0,
+                    totalPauseTime: 0,
+                    intervalId: null,
+                    timerIntervalId: null,
+                    motivationShown: 0,
+                    isComplete: false
+                });
+
+                DOM.startBtn.disabled = true;
+                DOM.controlButtons.classList.remove('hidden');
+                DOM.healthReport.classList.add('hidden');
+                DOM.logContainer.innerHTML = '';
+                showLog('[开始] 进程已启动', 'success');
+
+                // 启动计时器
+                session.timerIntervalId = setInterval(() => {
+                    if (!session.isPaused && session.isRunning) {
+                        const elapsed = Math.floor((performance.now() - session.startTime - session.totalPauseTime) /
+                        1000);
+                        DOM.timer.textContent = formatTime(elapsed);
+                    }
+                }, 1000);
+
+                await runSessionLoop();
+            }
+
+            async function runSessionLoop() {
+                while (session.currentCycle < config.totalCount && session.isRunning) {
+                    if (session.isPaused) {
+                        await sleep(100);
+                        continue;
+                    }
+                    session.currentCycle++;
+                    if (session.currentCycle % 2 === 1) {
+                        session.insertions++;
+                        const lube = config.useLube ? ' [润滑加成]' : '';
+                        showLog(`进入 >>> 第 ${session.insertions} 次${lube}`, 'insert');
+                        if (config.showMotivation && session.insertions % 3 === 0) {
+                            const msg = MOTIVATION_MESSAGES[Math.floor(Math.random() * MOTIVATION_MESSAGES.length)];
+                            await sleep(600);
+                            showLog(msg, 'motivation');
+                        }
+                    } else {
+                        showLog('拔出 <<< 完全拔出', 'withdraw');
+                    }
+                    updateStats();
+                    await sleep(config.actionDelay * 1000);
+                }
+                if (session.isRunning && !session.isPaused) {
+                    completeSession();
+                }
+            }
+
+            function pauseSession() {
+                session.isPaused = !session.isPaused;
+                if (session.isPaused) {
+                    session.pauseTime = performance.now();
+                    DOM.pauseText.textContent = '恢复';
+                    showLog('[暂停] 进程已暂停', 'info');
+                } else {
+                    session.totalPauseTime += performance.now() - session.pauseTime;
+                    DOM.pauseText.textContent = '暂停';
+                    showLog('[恢复] 进程继续...', 'info');
+                }
+            }
+
+            function stopSession() {
+                session.isRunning = false;
+                if (session.timerIntervalId) {
+                    clearInterval(session.timerIntervalId);
+                    session.timerIntervalId = null;
+                }
+                DOM.controlButtons.classList.add('hidden');
+                DOM.startBtn.disabled = false;
+                showLog('[停止] 进程已强制结束', 'info');
+                updateStats();
+            }
+
+            function completeSession() {
+                session.isRunning = false;
+                session.isComplete = true;
+                if (session.timerIntervalId) {
+                    clearInterval(session.timerIntervalId);
+                    session.timerIntervalId = null;
+                }
+                const duration = Math.floor((performance.now() - session.startTime - session.totalPauseTime) / 1000);
+                showCelebration();
+                showLog('[完成] 进程已顺利结束！', 'success');
+                showLog(`[统计] 共进入 ${session.insertions} 次，耗时 ${formatTime(duration)}`, 'success');
+
+                sessionHistory.push({
+                    date: new Date().toLocaleString('zh-CN'),
+                    insertions: session.insertions,
+                    duration: duration,
+                    usedLube: config.useLube
+                });
+                saveSessionHistory();
+                updateHistoryChart();
+                displayHealthReport();
+
+                DOM.controlButtons.classList.add('hidden');
+                DOM.startBtn.disabled = false;
+            }
+
+            function updateStats() {
+                const progress = (session.currentCycle / config.totalCount * 100);
+                DOM.progress.textContent = progress.toFixed(1) + '%';
+                DOM.progressBar.style.width = Math.min(100, progress) + '%';
+                DOM.insertCount.textContent = session.insertions;
+                const remaining = (config.totalCount - session.currentCycle) * config.actionDelay;
+                const mins = Math.floor(remaining / 60);
+                const secs = Math.floor(remaining % 60);
+                DOM.remaining.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            }
+
+            function displayHealthReport() {
+                DOM.healthReport.innerHTML = `
+                    <div class="health-report">
+                        <h3>事后健康评估</h3>
+                        <div class="health-item"><strong>观察:</strong> ${config.useLube ? '使用了润滑液 -- 注意保湿清洁。' : '未使用润滑液 -- 请仔细检查是否有轻微不适。'}</div>
+                        <div class="health-item"><strong>出血检查:</strong> 轻微出血点属正常。若出血量大，请停止并就医。</div>
+                        <div class="health-item"><strong>体液分泌:</strong> 适度分泌为正常的生理反应。</div>
+                        <div class="care-tips">
+                            <h4>护理与清洁建议</h4>
+                            <ul>
+                                <li>使用温水轻柔清洗该区域</li>
+                                <li>避免使用刺激性或带香味的清洁剂</li>
+                                <li>使用后立即清洗并消毒玩具</li>
+                                <li>建议休息时间：24–48 小时</li>
+                                <li>若持续疼痛请及时就医</li>
+                            </ul>
+                        </div>
+                    </div>`;
+                DOM.healthReport.classList.remove('hidden');
+            }
+
+            function showCelebration() {
+                const el = document.createElement('div');
+                el.className = 'celebration';
+                el.textContent = '✨ 完成 ✨';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1200);
+            }
+
+            // ===== 日志 ==============================================
+            function showLog(message, type = 'info') {
+                const log = DOM.logContainer;
+                const entry = document.createElement('div');
+                const icons = {
+                    insert: '[IN]',
+                    withdraw: '[OUT]',
+                    info: '[i]',
+                    success: '[OK]',
+                    motivation: '[...]'
+                };
+                const cls = `log-entry log-${type}`;
+                entry.className = cls;
+                entry.innerHTML =
+                    `<span class="log-icon">${icons[type] || '[i]'}</span><span>${new Date().toLocaleTimeString('zh-CN')} - ${sanitizeInput(message)}</span>`;
+                log.appendChild(entry);
+                // 限制条目数量
+                while (log.childNodes.length > 50) {
+                    log.removeChild(log.firstChild);
+                }
+                log.scrollTop = log.scrollHeight;
+            }
+
+            // ===== 游戏手柄控制器 (增强) ==============================
+            const GamepadController = {
+                _connected: false,
+                _gamepad: null,
+                _cursorX: window.innerWidth / 2,
+                _cursorY: window.innerHeight / 2,
+                _lastButtons: [],
+                _scrollSpeed: 20,
+                _cursorSpeed: 8,
+                _deadzone: 0.15,
+                _updateInterval: null,
+                _active: false,
+
+                init() {
+                    window.addEventListener('gamepadconnected', (e) => this._onConnect(e));
+                    window.addEventListener('gamepaddisconnected', (e) => this._onDisconnect(e));
+                    // 初始检测
+                    const gps = navigator.getGamepads();
+                    if (gps && gps[0]) {
+                        this._onConnect({ gamepad: gps[0] });
+                    }
+                    // 定期检测 (某些浏览器不会触发连接事件)
+                    setInterval(() => {
+                        if (!this._connected) {
+                            const pads = navigator.getGamepads();
+                            if (pads && pads[0]) {
+                                this._onConnect({ gamepad: pads[0] });
+                            }
+                        }
+                    }, 5000);
+                },
+
+                _onConnect(e) {
+                    this._connected = true;
+                    this._gamepad = e.gamepad;
+                    this._active = true;
+                    this._showToast('🎮 手柄已连接: ' + e.gamepad.id);
+                    this._showCursor();
+                    this._startUpdate();
+                },
+
+                _onDisconnect() {
+                    this._connected = false;
+                    this._active = false;
+                    this._showToast('手柄已断开连接');
+                    this._hideCursor();
+                    this._stopUpdate();
+                },
+
+                _showToast(msg) {
+                    DOM.gamepadToast.textContent = msg;
+                    DOM.gamepadToast.classList.add('show');
+                    clearTimeout(this._toastTimer);
+                    this._toastTimer = setTimeout(() => {
+                        DOM.gamepadToast.classList.remove('show');
+                    }, 3000);
+                },
+
+                _showCursor() {
+                    DOM.gamepadCursor.classList.add('active');
+                    DOM.gamepadCursor.style.left = this._cursorX + 'px';
+                    DOM.gamepadCursor.style.top = this._cursorY + 'px';
+                },
+
+                _hideCursor() {
+                    DOM.gamepadCursor.classList.remove('active');
+                },
+
+                _startUpdate() {
+                    if (this._updateInterval) return;
+                    this._updateInterval = setInterval(() => this._update(), 16);
+                },
+
+                _stopUpdate() {
+                    if (this._updateInterval) {
+                        clearInterval(this._updateInterval);
+                        this._updateInterval = null;
+                    }
+                },
+
+                _update() {
+                    const gps = navigator.getGamepads();
+                    if (!gps || !gps[0]) return;
+                    const gp = gps[0];
+
+                    const lx = this._applyDeadzone(gp.axes[0]);
+                    const ly = this._applyDeadzone(gp.axes[1]);
+                    if (lx || ly) {
+                        this._cursorX += lx * this._cursorSpeed;
+                        this._cursorY += ly * this._cursorSpeed;
+                        this._cursorX = clamp(this._cursorX, 0, window.innerWidth);
+                        this._cursorY = clamp(this._cursorY, 0, window.innerHeight);
+                        DOM.gamepadCursor.style.left = this._cursorX + 'px';
+                        DOM.gamepadCursor.style.top = this._cursorY + 'px';
+                        this._updateHoverElement();
+                    }
+
+                    const ry = this._applyDeadzone(gp.axes[3]);
+                    if (Math.abs(ry) > 0.1) {
+                        window.scrollBy(0, ry * this._scrollSpeed);
+                    }
+
+                    this._handleButtons(gp);
+                },
+
+                _applyDeadzone(v) {
+                    return Math.abs(v) < this._deadzone ? 0 : v;
+                },
+
+                _updateHoverElement() {
+                    const el = document.elementFromPoint(this._cursorX, this._cursorY);
+                    document.querySelectorAll('.gamepad-hover').forEach(e => e.classList.remove('gamepad-hover'));
+                    if (el && el.matches('button, a, input, select, .image-card, .btn-mini, .download-btn, .glass-btn, .checkbox-wrapper input')) {
+                        el.classList.add('gamepad-hover');
+                    }
+                },
+
+                _handleButtons(gp) {
+                    const b = gp.buttons;
+                    if (this._isButtonPressed(b[0], 0)) this._simulateClick();
+                    if (this._isButtonPressed(b[1], 1) && DOM.appView.classList.contains('active')) exitApp();
+                    if (this._isButtonPressed(b[2], 2)) location.reload();
+                    if (this._isButtonPressed(b[7], 7) && DOM.appView.classList.contains('active')) {
+                        if (!DOM.startBtn.disabled) startSession();
+                    }
+                    if (this._isButtonPressed(b[5], 5) && DOM.appView.classList.contains('active') && session.isRunning) {
+                        stopSession();
+                    }
+                    this._lastButtons = b.map(btn => btn.pressed);
+                },
+
+                _isButtonPressed(btn, idx) {
+                    const p = btn.pressed;
+                    const was = this._lastButtons[idx] || false;
+                    return p && !was;
+                },
+
+                _simulateClick() {
+                    const el = document.elementFromPoint(this._cursorX, this._cursorY);
+                    if (el) el.click();
+                }
+            };
+
+            // ===== 启动 ==============================================
+            function init() {
+                bindEvents();
+                loadGallery();
+                GamepadController.init();
+
+                // 初始加载设置
+                loadSettings();
+                loadSessionHistory();
+                displaySettingsHistory();
+
+                // 自动计算一次 (让界面有初始数据)
+                setTimeout(() => {
+                    if (config.actionDelay === 0) {
+                        calculateParams();
+                    }
+                }, 300);
+
+                console.log('[系统] 愉悦分析 Pro 已就绪');
+            }
+
+            // DOM 就绪后启动
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            // 暴露一些函数给全局 (用于调试，但尽量减少)
+            window._debug = {
+                config,
+                session,
+                sessionHistory,
+                loadGallery,
+                enterApp,
+                exitApp,
+                calculateParams,
+                startSession,
+                stopSession
+            };
+
+        })();
+    </script>
+</body>
+</html>
