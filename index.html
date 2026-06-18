@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <!-- CSP 修复：允许 picsum 及其 CDN 子域名 -->
+    <!-- CSP 允许 picsum 及其 CDN -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         style-src 'unsafe-inline' https://fonts.googleapis.com;
@@ -17,7 +17,7 @@
         connect-src 'self' https://picsum.photos https://*.picsum.photos;
     " />
     <style>
-        /* ===== 全部样式保持不变 ===== */
+        /* ===== 全部样式保持不变（略） ===== */
         *,
         *::before,
         *::after {
@@ -984,6 +984,15 @@
             background: rgba(255, 255, 255, 0.35);
             border-radius: var(--radius);
             overflow-x: auto;
+            justify-content: center;
+        }
+        .chart-container:has(> div:only-child) {
+            align-items: center;
+        }
+        .chart-container > div:only-child {
+            text-align: center;
+            width: 100%;
+            color: var(--text-tertiary);
         }
         .chart-bar {
             flex: 1;
@@ -1269,12 +1278,21 @@
     <script>
         /**
          * ============================================================
-         *  愉悦分析 Pro · 完整模块 (ES6 IIFE)
-         *  修复：CSP 放宽 + 下载改用 a 标签
+         *  愉悦分析 Pro · 最终修复版
+         *  修复：输入越界修正、频率熔断、循环安全哨兵、图表空态居中
+         *  新增：每个标签页独立存储设置（使用 sessionStorage 生成 tabId）
          * ============================================================
          */
         (() => {
             'use strict';
+
+            // ===== 生成标签页唯一标识符 ==============================
+            let tabId = sessionStorage.getItem('pa_tabId');
+            if (!tabId) {
+                tabId = 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                sessionStorage.setItem('pa_tabId', tabId);
+            }
+            console.log('[标签页] 当前标签页 ID:', tabId);
 
             // ===== 常量 ==============================================
             const MOTIVATION_MESSAGES = [
@@ -1305,8 +1323,11 @@
             });
 
             const STORAGE_KEYS = {
+                // 当前设置 - 每个标签页独立（加上 tabId 后缀）
                 CURRENT: 'pa_curr',
+                // 设置历史 - 全局共享
                 SETTINGS_HIST: 'pa_setHist',
+                // 进程历史 - 全局共享
                 SESS_HIST: 'pa_sessHist'
             };
 
@@ -1439,6 +1460,11 @@
                 }
             };
 
+            // 当前设置键名（带标签页后缀）
+            function getCurrentSettingsKey() {
+                return STORAGE_KEYS.CURRENT + '_' + tabId;
+            }
+
             // ===== 配置 & 会话状态 ====================================
             const config = {
                 length: 15,
@@ -1469,7 +1495,7 @@
             let sessionHistory = [];
 
             // ============================================================
-            //  ★★★ 图片加载管理器 (使用 seed 模式 + 修复下载) ★★★
+            //  ★★★ 图片加载管理器 (已修复 CSP + 下载) ★★★
             // ============================================================
             const ImageLoadManager = {
                 maxRetries: 3,
@@ -1590,11 +1616,9 @@
                     img.onerror = () => this.handleImageError(img, loading, newId, 1, downloadBtn);
                 },
 
-                // 修复下载：使用 a 标签，避免跨域问题
                 downloadImage(img, imageId) {
                     const downloadBtn = img.parentElement.querySelector('.download-btn');
                     downloadBtn.classList.add('downloading');
-                    // 直接使用 img.src 创建下载链接
                     const link = document.createElement('a');
                     link.href = img.src;
                     link.download = `风景-${imageId}-${Date.now()}.jpg`;
@@ -1602,7 +1626,6 @@
                     link.click();
                     document.body.removeChild(link);
 
-                    // 显示成功反馈
                     downloadBtn.classList.remove('downloading');
                     downloadBtn.innerHTML =
                         '<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -1610,6 +1633,10 @@
                         downloadBtn.innerHTML =
                             '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
                     }, 2000);
+                },
+
+                clearRetries() {
+                    this.retryingImages.clear();
                 }
             };
 
@@ -1642,6 +1669,7 @@
                 loadSettings();
                 loadSessionHistory();
                 displaySettingsHistory();
+                GamepadController.start();
             }
 
             function exitApp() {
@@ -1650,6 +1678,8 @@
                     clearInterval(session.timerIntervalId);
                     session.timerIntervalId = null;
                 }
+                GamepadController.stop();
+
                 DOM.landscapeView.style.display = 'block';
                 DOM.appView.classList.remove('active');
                 document.body.classList.remove('app-mode');
@@ -1659,22 +1689,24 @@
                 DOM.hiddenStone.dataset.clickCount = '0';
             }
 
-            // ===== 设置加载/保存 ======================================
+            // ===== 设置加载/保存 (使用标签页隔离) ========================
             function loadSettings() {
-                const saved = Storage.load(STORAGE_KEYS.CURRENT);
+                const key = getCurrentSettingsKey();
+                const saved = Storage.load(key);
                 if (saved) {
                     Object.assign(config, saved);
-                    DOM.toyLength.value = config.length;
-                    DOM.lengthSlider.value = config.length;
-                    DOM.toyDiameter.value = config.diameter;
-                    DOM.diameterSlider.value = config.diameter;
-                    DOM.totalCount.value = config.totalCount;
-                    DOM.experience.value = config.experience;
-                    DOM.useLube.checked = config.useLube;
-                    DOM.showMotivation.checked = config.showMotivation;
-                    updateLubeUI();
-                    updateMotivationUI();
                 }
+                // 更新 UI
+                DOM.toyLength.value = config.length;
+                DOM.lengthSlider.value = config.length;
+                DOM.toyDiameter.value = config.diameter;
+                DOM.diameterSlider.value = config.diameter;
+                DOM.totalCount.value = config.totalCount;
+                DOM.experience.value = config.experience;
+                DOM.useLube.checked = config.useLube;
+                DOM.showMotivation.checked = config.showMotivation;
+                updateLubeUI();
+                updateMotivationUI();
             }
 
             function saveSettings() {
@@ -1686,7 +1718,8 @@
                     config.totalCount++;
                     DOM.totalCount.value = config.totalCount;
                 }
-                Storage.save(STORAGE_KEYS.CURRENT, config);
+                const key = getCurrentSettingsKey();
+                Storage.save(key, config);
             }
 
             function toggleLube() {
@@ -1725,7 +1758,7 @@
                 }
             }
 
-            // ===== 历史记录 ==========================================
+            // ===== 历史记录 (全局共享) ==================================
             function saveToHistory() {
                 const snap = {
                     length: config.length,
@@ -1804,7 +1837,7 @@
                 DOM.showMotivation.checked = config.showMotivation;
                 updateLubeUI();
                 updateMotivationUI();
-                saveSettings();
+                saveSettings(); // 保存到当前标签页
                 showLog('[已恢复] 设置已成功恢复', 'success');
             }
 
@@ -1824,7 +1857,7 @@
                 showLog('[已清空] 所有历史记录已清空', 'info');
             }
 
-            // ===== 会话历史 ==========================================
+            // ===== 会话历史 (全局共享) ==================================
             function loadSessionHistory() {
                 sessionHistory = Storage.load(STORAGE_KEYS.SESS_HIST, []);
                 updateHistoryChart();
@@ -1838,8 +1871,9 @@
                 const container = DOM.historyChart;
                 container.innerHTML = '';
                 if (!sessionHistory.length) {
-                    container.innerHTML =
-                    '<div style="text-align:center;width:100%;color:var(--text-tertiary);">暂无数据</div>';
+                    const empty = document.createElement('div');
+                    empty.textContent = '暂无数据';
+                    container.appendChild(empty);
                     return;
                 }
                 const max = Math.max(...sessionHistory.map(h => h.insertions || 1));
@@ -1857,7 +1891,7 @@
                 });
             }
 
-            // ===== 计算逻辑 ==========================================
+            // ===== 计算逻辑 (修复：熔断最低频率) ======================
             function calculateParams() {
                 config.length = parseFloat(DOM.toyLength.value) || 1;
                 config.diameter = parseFloat(DOM.toyDiameter.value) || 0.5;
@@ -1881,7 +1915,8 @@
                 let base = (config.length / 30) + (config.diameter / 3) + 1.2;
                 base *= mult;
                 config.originalDelay = base;
-                config.actionDelay = config.useLube ? base * 0.70 : base;
+                // ★★★ 强制最低频率 0.2 秒，防止过载 ★★★
+                config.actionDelay = Math.max(0.2, config.useLube ? base * 0.70 : base);
 
                 if (config.useLube) showLog('[润滑] 速度已提升约 30%', 'success');
 
@@ -1993,6 +2028,8 @@
                     }
                     updateStats();
                     await sleep(config.actionDelay * 1000);
+                    // ★★★ 安全哨兵：每次醒来检查是否被外部停止 ★★★
+                    if (!session.isRunning) break;
                 }
                 if (session.isRunning && !session.isPaused) {
                     completeSession();
@@ -2111,7 +2148,7 @@
                 log.scrollTop = log.scrollHeight;
             }
 
-            // ===== 游戏手柄 ==========================================
+            // ===== 游戏手柄控制器 (内存泄漏修复) =======================
             const GamepadController = {
                 _connected: false,
                 _gamepad: null,
@@ -2125,13 +2162,15 @@
                 _active: false,
 
                 init() {
-                    window.addEventListener('gamepadconnected', (e) => this._onConnect(e));
-                    window.addEventListener('gamepaddisconnected', (e) => this._onDisconnect(e));
+                    this._onGamepadConnected = this._onConnect.bind(this);
+                    this._onGamepadDisconnected = this._onDisconnect.bind(this);
+                    window.addEventListener('gamepadconnected', this._onGamepadConnected);
+                    window.addEventListener('gamepaddisconnected', this._onGamepadDisconnected);
                     const gps = navigator.getGamepads();
                     if (gps && gps[0]) {
                         this._onConnect({ gamepad: gps[0] });
                     }
-                    setInterval(() => {
+                    this._pollInterval = setInterval(() => {
                         if (!this._connected) {
                             const pads = navigator.getGamepads();
                             if (pads && pads[0]) {
@@ -2141,21 +2180,34 @@
                     }, 5000);
                 },
 
+                start() {
+                    if (this._updateInterval) return;
+                    if (!this._connected) return;
+                    this._active = true;
+                    this._showCursor();
+                    this._updateInterval = setInterval(() => this._update(), 16);
+                },
+
+                stop() {
+                    if (this._updateInterval) {
+                        clearInterval(this._updateInterval);
+                        this._updateInterval = null;
+                    }
+                    this._active = false;
+                    this._hideCursor();
+                },
+
                 _onConnect(e) {
                     this._connected = true;
                     this._gamepad = e.gamepad;
-                    this._active = true;
                     this._showToast('🎮 手柄已连接: ' + e.gamepad.id);
-                    this._showCursor();
-                    this._startUpdate();
+                    this.start();
                 },
 
                 _onDisconnect() {
                     this._connected = false;
-                    this._active = false;
                     this._showToast('手柄已断开连接');
-                    this._hideCursor();
-                    this._stopUpdate();
+                    this.stop();
                 },
 
                 _showToast(msg) {
@@ -2175,18 +2227,6 @@
 
                 _hideCursor() {
                     DOM.gamepadCursor.classList.remove('active');
-                },
-
-                _startUpdate() {
-                    if (this._updateInterval) return;
-                    this._updateInterval = setInterval(() => this._update(), 16);
-                },
-
-                _stopUpdate() {
-                    if (this._updateInterval) {
-                        clearInterval(this._updateInterval);
-                        this._updateInterval = null;
-                    }
                 },
 
                 _update() {
@@ -2249,12 +2289,30 @@
                 _simulateClick() {
                     const el = document.elementFromPoint(this._cursorX, this._cursorY);
                     if (el) el.click();
+                },
+
+                destroy() {
+                    this.stop();
+                    if (this._pollInterval) {
+                        clearInterval(this._pollInterval);
+                        this._pollInterval = null;
+                    }
+                    if (this._onGamepadConnected) {
+                        window.removeEventListener('gamepadconnected', this._onGamepadConnected);
+                        window.removeEventListener('gamepaddisconnected', this._onGamepadDisconnected);
+                    }
+                    this._connected = false;
+                    this._gamepad = null;
+                    this._lastButtons = [];
                 }
             };
 
             // ===== 事件绑定 ==========================================
+            const _listeners = [];
+
             function bindEvents() {
-                DOM.yearTrigger.addEventListener('click', (e) => {
+                // 年份彩蛋
+                const yearHandler = (e) => {
                     e.stopPropagation();
                     const count = parseInt(DOM.yearTrigger.dataset.clickCount || '0') + 1;
                     DOM.yearTrigger.dataset.clickCount = count;
@@ -2262,9 +2320,12 @@
                         showStoneModal();
                         DOM.yearTrigger.dataset.clickCount = '0';
                     }
-                });
+                };
+                DOM.yearTrigger.addEventListener('click', yearHandler);
+                _listeners.push({ el: DOM.yearTrigger, type: 'click', handler: yearHandler });
 
-                DOM.hiddenStone.addEventListener('click', (e) => {
+                // 隐藏石头
+                const stoneHandler = (e) => {
                     e.stopPropagation();
                     if (!window._stoneVisible) return;
                     const count = parseInt(DOM.hiddenStone.dataset.clickCount || '0') + 1;
@@ -2275,15 +2336,23 @@
                         DOM.hiddenStone.classList.remove('visible');
                         window._stoneVisible = false;
                     }
-                });
+                };
+                DOM.hiddenStone.addEventListener('click', stoneHandler);
+                _listeners.push({ el: DOM.hiddenStone, type: 'click', handler: stoneHandler });
 
                 DOM.refreshBtn.addEventListener('click', loadGallery);
                 DOM.exitAppBtn.addEventListener('click', exitApp);
 
-                DOM.lengthSlider.addEventListener('input', (e) => {
-                    DOM.toyLength.value = e.target.value;
+                // ★★★ 输入越界修复：使用 change 事件强制修正显示值 ★★★
+                const clampLength = () => {
+                    let val = parseFloat(DOM.toyLength.value) || 0;
+                    val = clamp(val, 1, 150);
+                    DOM.toyLength.value = val;
+                    DOM.lengthSlider.value = val;
                     saveSettings();
-                });
+                };
+                DOM.toyLength.addEventListener('change', clampLength);
+                DOM.toyLength.addEventListener('blur', clampLength);
                 DOM.toyLength.addEventListener('input', (e) => {
                     let val = parseFloat(e.target.value) || 0;
                     val = clamp(val, 1, 150);
@@ -2291,14 +2360,28 @@
                     saveSettings();
                 });
 
-                DOM.diameterSlider.addEventListener('input', (e) => {
-                    DOM.toyDiameter.value = e.target.value;
+                const clampDiameter = () => {
+                    let val = parseFloat(DOM.toyDiameter.value) || 0;
+                    val = clamp(val, 0.5, 10);
+                    DOM.toyDiameter.value = val;
+                    DOM.diameterSlider.value = val;
                     saveSettings();
-                });
+                };
+                DOM.toyDiameter.addEventListener('change', clampDiameter);
+                DOM.toyDiameter.addEventListener('blur', clampDiameter);
                 DOM.toyDiameter.addEventListener('input', (e) => {
                     let val = parseFloat(e.target.value) || 0;
                     val = clamp(val, 0.5, 10);
                     DOM.diameterSlider.value = val;
+                    saveSettings();
+                });
+
+                DOM.lengthSlider.addEventListener('input', (e) => {
+                    DOM.toyLength.value = e.target.value;
+                    saveSettings();
+                });
+                DOM.diameterSlider.addEventListener('input', (e) => {
+                    DOM.toyDiameter.value = e.target.value;
                     saveSettings();
                 });
 
@@ -2313,13 +2396,15 @@
                 DOM.stopBtn.addEventListener('click', stopSession);
                 DOM.clearHistoryBtn.addEventListener('click', clearAllHistory);
 
-                document.addEventListener('keydown', (e) => {
+                const keyHandler = (e) => {
                     if (e.key === 'Escape' && DOM.appView.classList.contains('active')) {
                         exitApp();
                     }
-                });
+                };
+                document.addEventListener('keydown', keyHandler);
+                _listeners.push({ el: document, type: 'keydown', handler: keyHandler });
 
-                window.addEventListener('resize', () => {
+                const resizeHandler = () => {
                     if (GamepadController._active) {
                         const c = DOM.gamepadCursor;
                         GamepadController._cursorX = clamp(GamepadController._cursorX, 0, window.innerWidth);
@@ -2327,7 +2412,25 @@
                         c.style.left = GamepadController._cursorX + 'px';
                         c.style.top = GamepadController._cursorY + 'px';
                     }
+                };
+                window.addEventListener('resize', resizeHandler);
+                _listeners.push({ el: window, type: 'resize', handler: resizeHandler });
+            }
+
+            // ===== 全局清理 ==========================================
+            function cleanup() {
+                _listeners.forEach(({ el, type, handler }) => {
+                    el.removeEventListener(type, handler);
                 });
+                _listeners.length = 0;
+
+                if (session.timerIntervalId) {
+                    clearInterval(session.timerIntervalId);
+                    session.timerIntervalId = null;
+                }
+
+                GamepadController.destroy();
+                ImageLoadManager.clearRetries();
             }
 
             // ===== 初始化 ============================================
@@ -2343,7 +2446,9 @@
                         calculateParams();
                     }
                 }, 300);
-                console.log('[系统] 愉悦分析 Pro 已就绪 (CSP+下载已修复)');
+                console.log('[系统] 愉悦分析 Pro 已就绪 (最终边界修复 + 标签页独立存储)');
+
+                window.addEventListener('beforeunload', cleanup);
             }
 
             if (document.readyState === 'loading') {
@@ -2361,7 +2466,9 @@
                 exitApp,
                 calculateParams,
                 startSession,
-                stopSession
+                stopSession,
+                cleanup,
+                tabId
             };
 
         })();
