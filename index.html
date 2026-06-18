@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <!-- 安全策略 (CSP) 允许内联样式和脚本，但通过 nonce 或 hash 控制；这里用 meta 限制资源 -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         style-src 'unsafe-inline' https://fonts.googleapis.com;
@@ -17,7 +16,7 @@
         connect-src 'self' https://picsum.photos;
     " />
     <style>
-        /* ===== 全局变量 & 重置 ===== */
+        /* ===== 全部样式保持不变 ===== */
         *,
         *::before,
         *::after {
@@ -59,9 +58,7 @@
             --shadow-color: rgba(0, 0, 0, 0.06);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font-stack);
@@ -75,7 +72,6 @@
             transition: background 0.3s ease;
         }
 
-        /* ===== 通用玻璃卡片 ===== */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-amount));
@@ -99,7 +95,6 @@
             transition: var(--transition);
         }
 
-        /* ===== 玻璃按钮 ===== */
         .glass-btn {
             display: inline-flex;
             align-items: center;
@@ -130,9 +125,7 @@
             opacity: 0;
             transition: opacity 0.4s ease;
         }
-        .glass-btn:hover::after {
-            opacity: 1;
-        }
+        .glass-btn:hover::after { opacity: 1; }
         .glass-btn-primary {
             background: var(--accent);
             color: #fff;
@@ -144,9 +137,7 @@
             box-shadow: 0 6px 24px rgba(0, 113, 227, 0.35);
             transform: translateY(-2px);
         }
-        .glass-btn-primary:active {
-            transform: scale(0.96);
-        }
+        .glass-btn-primary:active { transform: scale(0.96); }
         .glass-btn-secondary {
             background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(12px);
@@ -176,7 +167,6 @@
             transform: none !important;
         }
 
-        /* ===== 玻璃输入 ===== */
         .glass-input {
             width: 100%;
             padding: 14px 18px;
@@ -197,10 +187,6 @@
             box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
             background: rgba(255, 255, 255, 0.75);
         }
-        .glass-input::placeholder {
-            color: var(--text-tertiary);
-            opacity: 0.6;
-        }
         .glass-select {
             appearance: none;
             -webkit-appearance: none;
@@ -211,7 +197,6 @@
             padding-right: 40px;
         }
 
-        /* ===== 游戏手柄光标 ===== */
         #gamepadCursor {
             position: fixed;
             width: 36px;
@@ -228,9 +213,7 @@
             transition: transform 0.04s linear;
             will-change: transform;
         }
-        #gamepadCursor.active {
-            display: block;
-        }
+        #gamepadCursor.active { display: block; }
         #gamepadCursor::after {
             content: '';
             position: absolute;
@@ -243,7 +226,6 @@
             border-radius: 50%;
         }
 
-        /* ===== Toast ===== */
         .gamepad-toast {
             position: fixed;
             top: 24px;
@@ -263,21 +245,12 @@
             animation: slideInRight 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
             max-width: 90vw;
         }
-        .gamepad-toast.show {
-            display: block;
-        }
+        .gamepad-toast.show { display: block; }
         @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* ===== 主视图 ===== */
         #landscapeView {
             min-height: 100vh;
             background: var(--surface-bg);
@@ -324,7 +297,6 @@
             margin-top: 28px;
         }
 
-        /* ===== 图片卡片 ===== */
         .image-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-amount));
@@ -355,9 +327,7 @@
             object-fit: cover;
             transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-        .image-card:hover .image-wrapper img {
-            transform: scale(1.06);
-        }
+        .image-card:hover .image-wrapper img { transform: scale(1.06); }
         .image-loading {
             position: absolute;
             top: 50%;
@@ -384,20 +354,11 @@
             font-size: 0.85rem;
         }
         @keyframes spin {
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
         }
         @keyframes retryPulse {
-            0%,
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: translate(-50%, -50%) scale(1.08);
-            }
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.08); }
         }
         .retry-info {
             position: absolute;
@@ -415,17 +376,10 @@
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp {
-            from {
-                transform: translateX(-50%) translateY(16px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
 
-        /* ===== 下载按钮 ===== */
         .download-btn {
             position: absolute;
             top: 14px;
@@ -454,31 +408,21 @@
             animation: downloadBtnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         @keyframes downloadBtnAppear {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            to { opacity: 1; transform: scale(1); }
         }
         .download-btn:hover {
             transform: scale(1.1);
             box-shadow: var(--glass-shadow-lg);
             background: rgba(255, 255, 255, 0.85);
         }
-        .download-btn:active {
-            transform: scale(0.93);
-        }
+        .download-btn:active { transform: scale(0.93); }
         .download-btn.downloading {
             animation: downloadPulse 1s ease-in-out infinite;
             pointer-events: none;
         }
         @keyframes downloadPulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.08);
-            }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
         }
 
         .image-info {
@@ -496,7 +440,6 @@
             font-size: 0.82rem;
         }
 
-        /* ===== 刷新按钮 ===== */
         .refresh-btn {
             position: fixed;
             bottom: 36px;
@@ -523,19 +466,14 @@
             transform: rotate(180deg) scale(1.08);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
         }
-        .refresh-btn:active {
-            transform: rotate(180deg) scale(0.92);
-        }
+        .refresh-btn:active { transform: rotate(180deg) scale(0.92); }
         .refresh-btn .icon-refresh {
             width: 24px;
             height: 24px;
             transition: transform 0.6s ease;
         }
-        .refresh-btn:hover .icon-refresh {
-            transform: rotate(180deg);
-        }
+        .refresh-btn:hover .icon-refresh { transform: rotate(180deg); }
 
-        /* ===== Footer ===== */
         .landscape-footer {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-amount));
@@ -548,11 +486,8 @@
             font-size: 0.88rem;
             letter-spacing: -0.01em;
         }
-        .landscape-footer p {
-            margin: 4px 0;
-        }
+        .landscape-footer p { margin: 4px 0; }
 
-        /* ===== 石头 modal ===== */
         .stone-modal {
             position: fixed;
             top: 0;
@@ -568,16 +503,10 @@
             z-index: 9999;
             animation: fadeIn 0.3s ease;
         }
-        .stone-modal.active {
-            display: flex;
-        }
+        .stone-modal.active { display: flex; }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .stone-shape {
@@ -601,27 +530,12 @@
             transform: rotate(-20deg);
         }
         @keyframes stoneDrop {
-            0% {
-                transform: translateY(-500px) rotate(0deg);
-                opacity: 0;
-            }
-            55% {
-                transform: translateY(0) rotate(360deg);
-                opacity: 1;
-            }
-            65% {
-                transform: translateY(-45px) rotate(380deg);
-            }
-            75% {
-                transform: translateY(0) rotate(360deg);
-            }
-            85% {
-                transform: translateY(-16px) rotate(370deg);
-            }
-            100% {
-                transform: translateY(0) rotate(360deg);
-                opacity: 1;
-            }
+            0% { transform: translateY(-500px) rotate(0deg); opacity: 0; }
+            55% { transform: translateY(0) rotate(360deg); opacity: 1; }
+            65% { transform: translateY(-45px) rotate(380deg); }
+            75% { transform: translateY(0) rotate(360deg); }
+            85% { transform: translateY(-16px) rotate(370deg); }
+            100% { transform: translateY(0) rotate(360deg); opacity: 1; }
         }
 
         .hidden-stone {
@@ -639,9 +553,7 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 -3px 8px rgba(0, 0, 0, 0.15), inset 0 2px 6px rgba(255, 255, 255, 0.2);
             transition: var(--transition-spring);
         }
-        .hidden-stone.visible {
-            display: block;
-        }
+        .hidden-stone.visible { display: block; }
         .hidden-stone:hover {
             transform: scale(1.15);
             box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3), inset 0 -3px 8px rgba(0, 0, 0, 0.15), inset 0 2px 6px rgba(255, 255, 255, 0.2);
@@ -658,13 +570,8 @@
             transform: rotate(-22deg);
         }
 
-        /* ===== App 视图 ===== */
-        #appView {
-            display: none;
-        }
-        #appView.active {
-            display: block;
-        }
+        #appView { display: none; }
+        #appView.active { display: block; }
         body.app-mode {
             background: linear-gradient(160deg, #f0f0f5 0%, #e8e8f0 30%, #f5f5f7 60%, #eaeaf2 100%);
             padding: 16px;
@@ -718,17 +625,10 @@
             box-shadow: var(--glass-shadow);
             transition: var(--transition);
         }
-        .card:hover {
-            box-shadow: var(--glass-shadow-lg);
-        }
-        .full-width {
-            grid-column: 1 / -1;
-        }
+        .card:hover { box-shadow: var(--glass-shadow-lg); }
+        .full-width { grid-column: 1 / -1; }
 
-        header {
-            text-align: center;
-            margin-bottom: 4px;
-        }
+        header { text-align: center; margin-bottom: 4px; }
         .logo {
             font-size: 2rem;
             font-weight: 800;
@@ -745,9 +645,7 @@
             letter-spacing: -0.01em;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+        .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block;
             font-weight: 500;
@@ -867,10 +765,7 @@
             color: var(--text-primary);
             letter-spacing: -0.01em;
         }
-        .toggle-icon {
-            font-size: 1.1rem;
-            opacity: 0.7;
-        }
+        .toggle-icon { font-size: 1.1rem; opacity: 0.7; }
         .toggle-status {
             font-size: 0.8rem;
             color: var(--text-secondary);
@@ -935,22 +830,10 @@
             font-family: var(--font-stack);
             letter-spacing: -0.01em;
         }
-        .btn-restore {
-            background: var(--accent);
-            color: #fff;
-        }
-        .btn-restore:hover {
-            background: var(--accent-hover);
-            transform: scale(1.04);
-        }
-        .btn-delete {
-            background: rgba(255, 59, 48, 0.15);
-            color: var(--danger);
-        }
-        .btn-delete:hover {
-            background: rgba(255, 59, 48, 0.25);
-            transform: scale(1.04);
-        }
+        .btn-restore { background: var(--accent); color: #fff; }
+        .btn-restore:hover { background: var(--accent-hover); transform: scale(1.04); }
+        .btn-delete { background: rgba(255, 59, 48, 0.15); color: var(--danger); }
+        .btn-delete:hover { background: rgba(255, 59, 48, 0.25); transform: scale(1.04); }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.45);
@@ -983,9 +866,7 @@
             font-weight: 500;
         }
 
-        .progress-container {
-            margin: 18px 0;
-        }
+        .progress-container { margin: 18px 0; }
         .progress-bar {
             height: 8px;
             background: rgba(0, 0, 0, 0.06);
@@ -1003,20 +884,13 @@
         .progress-fill::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
+            top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
             animation: shimmer-progress 2s infinite;
         }
         @keyframes shimmer-progress {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .log-container {
@@ -1030,16 +904,9 @@
             font-size: 0.8rem;
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        .log-container::-webkit-scrollbar {
-            width: 4px;
-        }
-        .log-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .log-container::-webkit-scrollbar-thumb {
-            background: var(--text-tertiary);
-            border-radius: 4px;
-        }
+        .log-container::-webkit-scrollbar { width: 4px; }
+        .log-container::-webkit-scrollbar-track { background: transparent; }
+        .log-container::-webkit-scrollbar-thumb { background: var(--text-tertiary); border-radius: 4px; }
 
         .log-entry {
             padding: 9px 12px;
@@ -1052,14 +919,8 @@
             letter-spacing: 0;
         }
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-16px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         .log-icon {
             font-weight: 600;
@@ -1069,26 +930,11 @@
             width: 28px;
             text-align: center;
         }
-        .log-insert {
-            background: rgba(255, 59, 48, 0.06);
-            border-left: 3px solid var(--danger);
-        }
-        .log-withdraw {
-            background: rgba(0, 113, 227, 0.05);
-            border-left: 3px solid var(--accent);
-        }
-        .log-info {
-            background: rgba(255, 159, 10, 0.05);
-            border-left: 3px solid var(--warning);
-        }
-        .log-success {
-            background: rgba(52, 199, 89, 0.06);
-            border-left: 3px solid var(--success);
-        }
-        .log-motivation {
-            background: rgba(175, 82, 222, 0.04);
-            border-left: 3px solid #af52de;
-        }
+        .log-insert { background: rgba(255, 59, 48, 0.06); border-left: 3px solid var(--danger); }
+        .log-withdraw { background: rgba(0, 113, 227, 0.05); border-left: 3px solid var(--accent); }
+        .log-info { background: rgba(255, 159, 10, 0.05); border-left: 3px solid var(--warning); }
+        .log-success { background: rgba(52, 199, 89, 0.06); border-left: 3px solid var(--success); }
+        .log-motivation { background: rgba(175, 82, 222, 0.04); border-left: 3px solid #af52de; }
 
         .safety-alert {
             border: 2px solid;
@@ -1102,32 +948,13 @@
             font-size: 0.9rem;
         }
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .safety-alert.high {
-            background: rgba(52, 199, 89, 0.06);
-            border-color: var(--success);
-        }
-        .safety-alert.medium {
-            background: rgba(255, 159, 10, 0.05);
-            border-color: var(--warning);
-        }
-        .safety-alert.low {
-            background: rgba(255, 59, 48, 0.05);
-            border-color: var(--danger);
-        }
-        .safety-icon {
-            font-weight: 700;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
+        .safety-alert.high { background: rgba(52, 199, 89, 0.06); border-color: var(--success); }
+        .safety-alert.medium { background: rgba(255, 159, 10, 0.05); border-color: var(--warning); }
+        .safety-alert.low { background: rgba(255, 59, 48, 0.05); border-color: var(--danger); }
+        .safety-icon { font-weight: 700; font-size: 1.2rem; flex-shrink: 0; }
 
         .calculation-result {
             background: rgba(0, 113, 227, 0.04);
@@ -1144,13 +971,8 @@
             border-bottom: 1px solid rgba(0, 113, 227, 0.1);
             font-size: 0.9rem;
         }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        .result-value {
-            font-weight: 600;
-            color: var(--accent);
-        }
+        .result-item:last-child { border-bottom: none; }
+        .result-value { font-weight: 600; color: var(--accent); }
 
         .chart-container {
             height: 180px;
@@ -1171,10 +993,7 @@
             cursor: pointer;
             position: relative;
         }
-        .chart-bar:hover {
-            opacity: 0.75;
-            transform: scaleY(1.04);
-        }
+        .chart-bar:hover { opacity: 0.75; transform: scaleY(1.04); }
 
         .health-report {
             background: rgba(255, 159, 10, 0.05);
@@ -1210,10 +1029,7 @@
             font-size: 0.9rem;
             letter-spacing: -0.01em;
         }
-        .care-tips ul {
-            list-style: none;
-            padding: 0;
-        }
+        .care-tips ul { list-style: none; padding: 0; }
         .care-tips li {
             padding: 7px 0 7px 22px;
             position: relative;
@@ -1231,9 +1047,7 @@
             transform: rotate(45deg);
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         .celebration {
             position: fixed;
@@ -1249,18 +1063,9 @@
             letter-spacing: -0.04em;
         }
         @keyframes celebrate {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.15);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0;
-            }
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
         }
 
         .btn-group {
@@ -1270,170 +1075,53 @@
             margin-top: 4px;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 1024px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-            .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 20px;
-            }
-            .landscape-title {
-                font-size: 1.8rem;
-            }
-            .logo {
-                font-size: 1.6rem;
-            }
+            .app-container { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+            .landscape-title { font-size: 1.8rem; }
+            .logo { font-size: 1.6rem; }
         }
-
         @media (max-width: 768px) {
-            body.app-mode {
-                padding: 10px;
-            }
-            .app-container {
-                grid-template-columns: 1fr;
-                gap: 14px;
-            }
-            .card {
-                padding: 20px;
-            }
-            .logo {
-                font-size: 1.4rem;
-            }
-            .gallery-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .landscape-title {
-                font-size: 1.5rem;
-            }
-            .landscape-container {
-                padding: 20px 10px;
-            }
-            .refresh-btn {
-                width: 46px;
-                height: 46px;
-                bottom: 20px;
-                right: 20px;
-                font-size: 1.2rem;
-            }
-            .hidden-stone {
-                bottom: 80px;
-                right: 20px;
-                width: 36px;
-                height: 30px;
-            }
-            .exit-btn {
-                top: 10px;
-                right: 10px;
-                padding: 8px 18px;
-                font-size: 0.82rem;
-            }
-            .stat-card {
-                padding: 14px;
-            }
-            .stat-value {
-                font-size: 1.5rem;
-            }
-            .log-container {
-                height: 280px;
-                font-size: 0.75rem;
-            }
-            .gamepad-toast {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                padding: 12px 18px;
-                font-size: 0.85rem;
-            }
-            #gamepadCursor {
-                width: 42px;
-                height: 42px;
-            }
-            .download-btn {
-                width: 36px;
-                height: 36px;
-                top: 10px;
-                right: 10px;
-            }
+            body.app-mode { padding: 10px; }
+            .app-container { grid-template-columns: 1fr; gap: 14px; }
+            .card { padding: 20px; }
+            .logo { font-size: 1.4rem; }
+            .gallery-grid { grid-template-columns: 1fr; gap: 16px; }
+            .landscape-title { font-size: 1.5rem; }
+            .landscape-container { padding: 20px 10px; }
+            .refresh-btn { width: 46px; height: 46px; bottom: 20px; right: 20px; font-size: 1.2rem; }
+            .hidden-stone { bottom: 80px; right: 20px; width: 36px; height: 30px; }
+            .exit-btn { top: 10px; right: 10px; padding: 8px 18px; font-size: 0.82rem; }
+            .stat-card { padding: 14px; }
+            .stat-value { font-size: 1.5rem; }
+            .log-container { height: 280px; font-size: 0.75rem; }
+            .gamepad-toast { top: 10px; right: 10px; left: 10px; padding: 12px 18px; font-size: 0.85rem; }
+            #gamepadCursor { width: 42px; height: 42px; }
+            .download-btn { width: 36px; height: 36px; top: 10px; right: 10px; }
         }
-
         @media (max-width: 480px) {
-            .landscape-title {
-                font-size: 1.3rem;
-            }
-            .logo {
-                font-size: 1.2rem;
-            }
-            .glass-btn {
-                padding: 10px 18px;
-                font-size: 0.85rem;
-            }
-            .form-group label {
-                font-size: 0.82rem;
-            }
-            .glass-input {
-                padding: 11px 14px;
-                font-size: 0.88rem;
-            }
-            .history-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .history-actions {
-                justify-content: flex-end;
-            }
+            .landscape-title { font-size: 1.3rem; }
+            .logo { font-size: 1.2rem; }
+            .glass-btn { padding: 10px 18px; font-size: 0.85rem; }
+            .form-group label { font-size: 0.82rem; }
+            .glass-input { padding: 11px 14px; font-size: 0.88rem; }
+            .history-item { flex-direction: column; align-items: stretch; }
+            .history-actions { justify-content: flex-end; }
         }
 
-        /* ===== 微交互 ===== */
-        .fade-transition {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .scale-on-hover {
-            transition: transform 0.2s ease;
-        }
-        .scale-on-hover:hover {
-            transform: scale(1.02);
-        }
+        .fade-transition { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .scale-on-hover { transition: transform 0.2s ease; }
+        .scale-on-hover:hover { transform: scale(1.02); }
 
-        /* 滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--text-tertiary);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.04); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--text-tertiary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-        /* 选中高亮 */
         .gamepad-hover {
             outline: 2px solid var(--accent);
             outline-offset: 2px;
             border-radius: inherit;
-        }
-
-        /* 加载骨架 */
-        .skeleton {
-            background: linear-gradient(90deg, #e8e8ed 25%, #f0f0f5 50%, #e8e8ed 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s ease-in-out infinite;
-        }
-        @keyframes skeleton-loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
         }
     </style>
 </head>
@@ -1581,7 +1269,7 @@
         /**
          * ============================================================
          *  愉悦分析 Pro · 完整模块 (ES6 IIFE)
-         *  安全性 · 可维护性 · UI 细节优化
+         *  修复图片加载：改用 seed 模式确保稳定
          * ============================================================
          */
         (() => {
@@ -1635,7 +1323,6 @@
                 landscapeView: $('#landscapeView'),
                 exitAppBtn: $('#exitAppBtn'),
 
-                // 设置
                 useLube: $('#useLube'),
                 showMotivation: $('#showMotivation'),
                 toyLength: $('#toyLength'),
@@ -1656,7 +1343,6 @@
                 historyList: $('#historyList'),
                 clearHistoryBtn: $('#clearHistoryBtn'),
 
-                // 统计
                 timer: $('#timer'),
                 progress: $('#progress'),
                 insertCount: $('#insertCount'),
@@ -1667,12 +1353,9 @@
                 pauseText: $('#pauseText'),
                 stopBtn: $('#stopBtn'),
                 historyChart: $('#historyChart'),
-
-                // 日志
                 logContainer: $('#logContainer'),
                 healthReport: $('#healthReport'),
 
-                // 手柄
                 gamepadCursor: $('#gamepadCursor'),
                 gamepadToast: $('#gamepadToast'),
             };
@@ -1694,8 +1377,7 @@
             }
 
             function sanitizeInput(value) {
-                const str = String(value).trim();
-                return str.replace(/[<>'"`]/g, ''); // 简单 XSS 防护
+                return String(value).trim().replace(/[<>'"`]/g, '');
             }
 
             function getExpText(exp) {
@@ -1756,7 +1438,7 @@
                 }
             };
 
-            // ===== 配置状态 ==========================================
+            // ===== 配置 & 会话状态 ====================================
             const config = {
                 length: 15,
                 diameter: 3,
@@ -1769,7 +1451,6 @@
                 originalDelay: 0
             };
 
-            // ===== 会话状态 ==========================================
             const session = {
                 isRunning: false,
                 isPaused: false,
@@ -1786,169 +1467,71 @@
 
             let sessionHistory = [];
 
-            // ===== DOM 事件绑定 (安全, 无内联) ========================
-            function bindEvents() {
-                // 年份点击 -> 石头彩蛋
-                DOM.yearTrigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const count = parseInt(DOM.yearTrigger.dataset.clickCount || '0') + 1;
-                    DOM.yearTrigger.dataset.clickCount = count;
-                    if (count >= 10) {
-                        showStoneModal();
-                        DOM.yearTrigger.dataset.clickCount = '0';
-                    }
-                });
-
-                // 隐藏石头点击 -> 进入 App
-                DOM.hiddenStone.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (!window._stoneVisible) return;
-                    const count = parseInt(DOM.hiddenStone.dataset.clickCount || '0') + 1;
-                    DOM.hiddenStone.dataset.clickCount = count;
-                    if (count >= 10) {
-                        enterApp();
-                        DOM.hiddenStone.dataset.clickCount = '0';
-                        DOM.hiddenStone.classList.remove('visible');
-                        window._stoneVisible = false;
-                    }
-                });
-
-                // 刷新画廊
-                DOM.refreshBtn.addEventListener('click', loadGallery);
-
-                // 退出 App
-                DOM.exitAppBtn.addEventListener('click', exitApp);
-
-                // 滑块同步
-                DOM.lengthSlider.addEventListener('input', (e) => {
-                    DOM.toyLength.value = e.target.value;
-                    saveSettings();
-                });
-                DOM.toyLength.addEventListener('input', (e) => {
-                    let val = parseFloat(e.target.value) || 0;
-                    val = clamp(val, 1, 150);
-                    DOM.lengthSlider.value = val;
-                    saveSettings();
-                });
-
-                DOM.diameterSlider.addEventListener('input', (e) => {
-                    DOM.toyDiameter.value = e.target.value;
-                    saveSettings();
-                });
-                DOM.toyDiameter.addEventListener('input', (e) => {
-                    let val = parseFloat(e.target.value) || 0;
-                    val = clamp(val, 0.5, 10);
-                    DOM.diameterSlider.value = val;
-                    saveSettings();
-                });
-
-                // 复选框
-                DOM.useLube.addEventListener('change', toggleLube);
-                DOM.showMotivation.addEventListener('change', toggleMotivation);
-
-                // 其他设置变更自动保存
-                DOM.totalCount.addEventListener('change', saveSettings);
-                DOM.experience.addEventListener('change', saveSettings);
-
-                // 计算按钮
-                DOM.calculateBtn.addEventListener('click', calculateParams);
-
-                // 开始 / 暂停 / 停止
-                DOM.startBtn.addEventListener('click', startSession);
-                DOM.pauseBtn.addEventListener('click', pauseSession);
-                DOM.stopBtn.addEventListener('click', stopSession);
-
-                // 清空历史
-                DOM.clearHistoryBtn.addEventListener('click', clearAllHistory);
-
-                // 键盘快捷键: ESC 退出 App
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && DOM.appView.classList.contains('active')) {
-                        exitApp();
-                    }
-                });
-
-                // 窗口尺寸变化时更新手柄光标位置
-                window.addEventListener('resize', () => {
-                    if (GamepadController._active) {
-                        const c = DOM.gamepadCursor;
-                        GamepadController._cursorX = clamp(GamepadController._cursorX, 0, window.innerWidth);
-                        GamepadController._cursorY = clamp(GamepadController._cursorY, 0, window.innerHeight);
-                        c.style.left = GamepadController._cursorX + 'px';
-                        c.style.top = GamepadController._cursorY + 'px';
-                    }
-                });
-            }
-
-            // ===== 图片加载管理器 (增强) ==============================
+            // ============================================================
+            //  ★★★ 图片加载管理器 (使用 seed 模式确保稳定) ★★★
+            // ============================================================
             const ImageLoadManager = {
                 maxRetries: 3,
                 retryDelay: 2000,
-                _retrying: new Map(),
+                retryingImages: new Map(),
 
-                createCard(id, container) {
+                // 生成图片 URL：使用 seed 模式，保证每个 id 都有图片
+                buildImageUrl(id) {
+                    return `https://picsum.photos/seed/${id}/400/300`;
+                },
+
+                createImageCardWithRetry(id, container) {
                     const card = document.createElement('div');
                     card.className = 'image-card';
                     card.dataset.imageId = id;
-
                     const wrapper = document.createElement('div');
                     wrapper.className = 'image-wrapper';
-
                     const loading = document.createElement('div');
                     loading.className = 'image-loading spinner';
                     wrapper.appendChild(loading);
-
                     const downloadBtn = document.createElement('button');
                     downloadBtn.className = 'download-btn';
                     downloadBtn.title = '下载图片';
                     downloadBtn.innerHTML =
-                        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
-                    downloadBtn.addEventListener('click', (e) => {
+                        '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
+                    downloadBtn.onclick = (e) => {
                         e.stopPropagation();
-                        this._downloadImage(img, id);
-                    });
+                        this.downloadImage(img, id);
+                    };
                     wrapper.appendChild(downloadBtn);
-
                     const img = document.createElement('img');
-                    img.src = `https://picsum.photos/id/${id}/400/300`;
+                    img.src = this.buildImageUrl(id);
                     img.alt = '风景照片';
                     img.style.display = 'none';
-                    img.loading = 'lazy';
-
-                    img.addEventListener('load', () => {
+                    img.onload = () => {
                         loading.style.display = 'none';
                         img.style.display = 'block';
-                        this._retrying.delete(id);
+                        this.retryingImages.delete(id);
                         setTimeout(() => downloadBtn.classList.add('show'), 300);
-                    });
-
-                    img.addEventListener('error', () => {
-                        this._handleError(img, loading, id, 1, downloadBtn);
-                    });
-
+                    };
+                    img.onerror = () => this.handleImageError(img, loading, id, 1, downloadBtn);
                     wrapper.appendChild(img);
                     card.appendChild(wrapper);
-
                     const info = document.createElement('div');
                     info.className = 'image-info';
                     info.innerHTML =
                         `<div class="image-author">图片 #${id}</div><div class="image-dimensions">400 × 300 px</div>`;
                     card.appendChild(info);
-
                     container.appendChild(card);
                 },
 
-                _handleError(img, loading, originalId, attempt, downloadBtn) {
+                handleImageError(img, loading, originalId, attemptNumber, downloadBtn) {
                     downloadBtn.classList.remove('show');
-                    if (attempt > this.maxRetries) {
+                    if (attemptNumber > this.maxRetries) {
                         loading.classList.remove('spinner', 'retrying');
                         loading.textContent = '加载失败';
                         loading.style.fontSize = '0.85rem';
                         loading.style.color = 'var(--danger)';
-                        this._retrying.delete(originalId);
+                        this.retryingImages.delete(originalId);
+                        // 最后尝试换一个 id
                         setTimeout(() => {
-                            const newId = Math.floor(Math.random() * 1000);
-                            this._retryWithNewId(img, loading, newId, downloadBtn);
+                            const newId = Math.floor(Math.random() * 10000);
+                            this.retryWithNewId(img, loading, newId, downloadBtn);
                         }, 5000);
                         return;
                     }
@@ -1956,36 +1539,35 @@
                     loading.classList.add('retrying');
                     loading.textContent = '重试中...';
                     const wrapper = img.parentElement;
-                    let infoEl = wrapper.querySelector('.retry-info');
-                    if (!infoEl) {
-                        infoEl = document.createElement('div');
-                        infoEl.className = 'retry-info';
-                        wrapper.appendChild(infoEl);
+                    let retryInfo = wrapper.querySelector('.retry-info');
+                    if (!retryInfo) {
+                        retryInfo = document.createElement('div');
+                        retryInfo.className = 'retry-info';
+                        wrapper.appendChild(retryInfo);
                     }
-                    infoEl.textContent = `尝试加载 ${attempt}/${this.maxRetries}`;
-                    this._retrying.set(originalId, attempt);
-
+                    retryInfo.textContent = `尝试加载 ${attemptNumber}/${this.maxRetries}`;
+                    this.retryingImages.set(originalId, attemptNumber);
                     setTimeout(() => {
-                        const newId = Math.floor(Math.random() * 1000);
-                        img.src = `https://picsum.photos/id/${newId}/400/300?t=${Date.now()}`;
-                        img.addEventListener('error', () => {
-                            this._handleError(img, loading, originalId, attempt + 1, downloadBtn);
-                        }, { once: true });
-                        img.addEventListener('load', () => {
+                        // 重试时换一个随机 id，但保持 seed 模式
+                        const newId = Math.floor(Math.random() * 10000);
+                        img.src = this.buildImageUrl(newId) + '?t=' + Date.now();
+                        img.onerror = () => this.handleImageError(img, loading, originalId, attemptNumber + 1,
+                            downloadBtn);
+                        img.onload = () => {
                             loading.style.display = 'none';
                             img.style.display = 'block';
-                            if (infoEl) infoEl.remove();
-                            this._retrying.delete(originalId);
+                            if (retryInfo) retryInfo.remove();
+                            this.retryingImages.delete(originalId);
                             setTimeout(() => downloadBtn.classList.add('show'), 300);
                             const card = img.closest('.image-card');
                             const author = card.querySelector('.image-author');
                             if (author) author.textContent = `图片 #${newId}`;
                             card.dataset.imageId = newId;
-                        }, { once: true });
+                        };
                     }, this.retryDelay);
                 },
 
-                _retryWithNewId(img, loading, newId, downloadBtn) {
+                retryWithNewId(img, loading, newId, downloadBtn) {
                     loading.classList.add('spinner');
                     loading.classList.remove('retrying');
                     loading.textContent = '';
@@ -1994,33 +1576,31 @@
                     img.style.display = 'none';
                     downloadBtn.classList.remove('show');
                     const wrapper = img.parentElement;
-                    const infoEl = wrapper.querySelector('.retry-info');
-                    if (infoEl) infoEl.textContent = '重新加载中...';
-                    img.src = `https://picsum.photos/id/${newId}/400/300?t=${Date.now()}`;
-                    img.addEventListener('load', () => {
+                    const retryInfo = wrapper.querySelector('.retry-info');
+                    if (retryInfo) retryInfo.textContent = '重新加载中...';
+                    img.src = this.buildImageUrl(newId) + '?t=' + Date.now();
+                    img.onload = () => {
                         loading.style.display = 'none';
                         img.style.display = 'block';
-                        if (infoEl) infoEl.remove();
+                        if (retryInfo) retryInfo.remove();
                         setTimeout(() => downloadBtn.classList.add('show'), 300);
                         const card = img.closest('.image-card');
                         const author = card.querySelector('.image-author');
                         if (author) author.textContent = `图片 #${newId}`;
                         card.dataset.imageId = newId;
-                    }, { once: true });
-                    img.addEventListener('error', () => {
-                        this._handleError(img, loading, newId, 1, downloadBtn);
-                    }, { once: true });
+                    };
+                    img.onerror = () => this.handleImageError(img, loading, newId, 1, downloadBtn);
                 },
 
-                _downloadImage(img, imageId) {
-                    const btn = img.parentElement.querySelector('.download-btn');
-                    btn.classList.add('downloading');
-                    btn.innerHTML =
-                        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin-continuous 0.7s linear infinite;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 10"/></svg>`;
+                downloadImage(img, imageId) {
+                    const downloadBtn = img.parentElement.querySelector('.download-btn');
+                    downloadBtn.classList.add('downloading');
+                    downloadBtn.innerHTML =
+                        '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin-continuous 0.7s linear infinite;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 10"/></svg>';
                     fetch(img.src)
-                        .then(res => {
-                            if (!res.ok) throw new Error('Network error');
-                            return res.blob();
+                        .then(response => {
+                            if (!response.ok) throw new Error('网络错误');
+                            return response.blob();
                         })
                         .then(blob => {
                             const url = window.URL.createObjectURL(blob);
@@ -2032,22 +1612,22 @@
                             setTimeout(() => {
                                 document.body.removeChild(a);
                                 window.URL.revokeObjectURL(url);
-                                btn.classList.remove('downloading');
-                                btn.innerHTML =
-                                    `<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>`;
+                                downloadBtn.classList.remove('downloading');
+                                downloadBtn.innerHTML =
+                                    '<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>';
                                 setTimeout(() => {
-                                    btn.innerHTML =
-                                        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+                                    downloadBtn.innerHTML =
+                                        '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
                                 }, 2000);
                             }, 100);
                         })
                         .catch(() => {
-                            btn.classList.remove('downloading');
-                            btn.innerHTML =
-                                `<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+                            downloadBtn.classList.remove('downloading');
+                            downloadBtn.innerHTML =
+                                '<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
                             setTimeout(() => {
-                                btn.innerHTML =
-                                    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+                                downloadBtn.innerHTML =
+                                    '<svg class="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
                             }, 2000);
                         });
                 }
@@ -2058,8 +1638,8 @@
                 const gallery = DOM.gallery;
                 gallery.innerHTML = '';
                 for (let i = 0; i < 12; i++) {
-                    const id = Math.floor(Math.random() * 1000);
-                    ImageLoadManager.createCard(id, gallery);
+                    const randomId = Math.floor(Math.random() * 10000);
+                    ImageLoadManager.createImageCardWithRetry(randomId, gallery);
                 }
             }
 
@@ -2085,10 +1665,7 @@
             }
 
             function exitApp() {
-                // 清理会话
-                if (session.isRunning) {
-                    stopSession();
-                }
+                if (session.isRunning) stopSession();
                 if (session.timerIntervalId) {
                     clearInterval(session.timerIntervalId);
                     session.timerIntervalId = null;
@@ -2098,7 +1675,6 @@
                 document.body.classList.remove('app-mode');
                 DOM.hiddenStone.classList.remove('visible');
                 window._stoneVisible = false;
-                // 重置计数
                 DOM.yearTrigger.dataset.clickCount = '0';
                 DOM.hiddenStone.dataset.clickCount = '0';
             }
@@ -2126,7 +1702,6 @@
                 config.diameter = parseFloat(DOM.toyDiameter.value) || 0.5;
                 config.totalCount = parseInt(DOM.totalCount.value) || 10;
                 config.experience = DOM.experience.value;
-                // 确保偶数
                 if (config.totalCount % 2 !== 0) {
                     config.totalCount++;
                     DOM.totalCount.value = config.totalCount;
@@ -2220,8 +1795,6 @@
                     `;
                     DOM.historyList.appendChild(div);
                 });
-
-                // 事件委托
                 DOM.historyList.querySelectorAll('[data-restore]').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const id = parseInt(btn.dataset.restore);
@@ -2285,7 +1858,8 @@
                 const container = DOM.historyChart;
                 container.innerHTML = '';
                 if (!sessionHistory.length) {
-                    container.innerHTML = '<div style="text-align:center;width:100%;color:var(--text-tertiary);">暂无数据</div>';
+                    container.innerHTML =
+                    '<div style="text-align:center;width:100%;color:var(--text-tertiary);">暂无数据</div>';
                     return;
                 }
                 const max = Math.max(...sessionHistory.map(h => h.insertions || 1));
@@ -2387,7 +1961,6 @@
                     showLog('[错误] 请先点击计算按钮', 'info');
                     return;
                 }
-                // 重置会话
                 Object.assign(session, {
                     isRunning: true,
                     isPaused: false,
@@ -2408,11 +1981,10 @@
                 DOM.logContainer.innerHTML = '';
                 showLog('[开始] 进程已启动', 'success');
 
-                // 启动计时器
                 session.timerIntervalId = setInterval(() => {
                     if (!session.isPaused && session.isRunning) {
                         const elapsed = Math.floor((performance.now() - session.startTime - session.totalPauseTime) /
-                        1000);
+                            1000);
                         DOM.timer.textContent = formatTime(elapsed);
                     }
                 }, 1000);
@@ -2538,7 +2110,6 @@
                 setTimeout(() => el.remove(), 1200);
             }
 
-            // ===== 日志 ==============================================
             function showLog(message, type = 'info') {
                 const log = DOM.logContainer;
                 const entry = document.createElement('div');
@@ -2554,14 +2125,13 @@
                 entry.innerHTML =
                     `<span class="log-icon">${icons[type] || '[i]'}</span><span>${new Date().toLocaleTimeString('zh-CN')} - ${sanitizeInput(message)}</span>`;
                 log.appendChild(entry);
-                // 限制条目数量
                 while (log.childNodes.length > 50) {
                     log.removeChild(log.firstChild);
                 }
                 log.scrollTop = log.scrollHeight;
             }
 
-            // ===== 游戏手柄控制器 (增强) ==============================
+            // ===== 游戏手柄 ==========================================
             const GamepadController = {
                 _connected: false,
                 _gamepad: null,
@@ -2577,12 +2147,10 @@
                 init() {
                     window.addEventListener('gamepadconnected', (e) => this._onConnect(e));
                     window.addEventListener('gamepaddisconnected', (e) => this._onDisconnect(e));
-                    // 初始检测
                     const gps = navigator.getGamepads();
                     if (gps && gps[0]) {
                         this._onConnect({ gamepad: gps[0] });
                     }
-                    // 定期检测 (某些浏览器不会触发连接事件)
                     setInterval(() => {
                         if (!this._connected) {
                             const pads = navigator.getGamepads();
@@ -2704,35 +2272,106 @@
                 }
             };
 
-            // ===== 启动 ==============================================
+            // ===== 事件绑定 ==========================================
+            function bindEvents() {
+                DOM.yearTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const count = parseInt(DOM.yearTrigger.dataset.clickCount || '0') + 1;
+                    DOM.yearTrigger.dataset.clickCount = count;
+                    if (count >= 10) {
+                        showStoneModal();
+                        DOM.yearTrigger.dataset.clickCount = '0';
+                    }
+                });
+
+                DOM.hiddenStone.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!window._stoneVisible) return;
+                    const count = parseInt(DOM.hiddenStone.dataset.clickCount || '0') + 1;
+                    DOM.hiddenStone.dataset.clickCount = count;
+                    if (count >= 10) {
+                        enterApp();
+                        DOM.hiddenStone.dataset.clickCount = '0';
+                        DOM.hiddenStone.classList.remove('visible');
+                        window._stoneVisible = false;
+                    }
+                });
+
+                DOM.refreshBtn.addEventListener('click', loadGallery);
+                DOM.exitAppBtn.addEventListener('click', exitApp);
+
+                DOM.lengthSlider.addEventListener('input', (e) => {
+                    DOM.toyLength.value = e.target.value;
+                    saveSettings();
+                });
+                DOM.toyLength.addEventListener('input', (e) => {
+                    let val = parseFloat(e.target.value) || 0;
+                    val = clamp(val, 1, 150);
+                    DOM.lengthSlider.value = val;
+                    saveSettings();
+                });
+
+                DOM.diameterSlider.addEventListener('input', (e) => {
+                    DOM.toyDiameter.value = e.target.value;
+                    saveSettings();
+                });
+                DOM.toyDiameter.addEventListener('input', (e) => {
+                    let val = parseFloat(e.target.value) || 0;
+                    val = clamp(val, 0.5, 10);
+                    DOM.diameterSlider.value = val;
+                    saveSettings();
+                });
+
+                DOM.useLube.addEventListener('change', toggleLube);
+                DOM.showMotivation.addEventListener('change', toggleMotivation);
+                DOM.totalCount.addEventListener('change', saveSettings);
+                DOM.experience.addEventListener('change', saveSettings);
+
+                DOM.calculateBtn.addEventListener('click', calculateParams);
+                DOM.startBtn.addEventListener('click', startSession);
+                DOM.pauseBtn.addEventListener('click', pauseSession);
+                DOM.stopBtn.addEventListener('click', stopSession);
+                DOM.clearHistoryBtn.addEventListener('click', clearAllHistory);
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && DOM.appView.classList.contains('active')) {
+                        exitApp();
+                    }
+                });
+
+                window.addEventListener('resize', () => {
+                    if (GamepadController._active) {
+                        const c = DOM.gamepadCursor;
+                        GamepadController._cursorX = clamp(GamepadController._cursorX, 0, window.innerWidth);
+                        GamepadController._cursorY = clamp(GamepadController._cursorY, 0, window.innerHeight);
+                        c.style.left = GamepadController._cursorX + 'px';
+                        c.style.top = GamepadController._cursorY + 'px';
+                    }
+                });
+            }
+
+            // ===== 初始化 ============================================
             function init() {
                 bindEvents();
                 loadGallery();
                 GamepadController.init();
-
-                // 初始加载设置
                 loadSettings();
                 loadSessionHistory();
                 displaySettingsHistory();
-
-                // 自动计算一次 (让界面有初始数据)
                 setTimeout(() => {
                     if (config.actionDelay === 0) {
                         calculateParams();
                     }
                 }, 300);
-
-                console.log('[系统] 愉悦分析 Pro 已就绪');
+                console.log('[系统] 愉悦分析 Pro 已就绪 (图片加载已修复)');
             }
 
-            // DOM 就绪后启动
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
                 init();
             }
 
-            // 暴露一些函数给全局 (用于调试，但尽量减少)
             window._debug = {
                 config,
                 session,
